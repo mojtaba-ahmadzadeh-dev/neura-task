@@ -1,0 +1,81 @@
+// auth.controller.ts
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from "@nestjs/common";
+import { AuthService } from "./service/auth.service";
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+  VerifyOtpDto,
+} from "./dto/auth.dto";
+import { ApiConsumes, ApiTags } from "@nestjs/swagger";
+import type { Response } from "express";
+import { RbacGuard } from "../rbac/guards/rbac.guard";
+
+@Controller("auth")
+@ApiTags("Auth")
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @Post("register")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiConsumes("application/x-www-form-urlencoded")
+  register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.register(registerDto, res);
+  }
+
+  @Post("verify-otp")
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes("application/x-www-form-urlencoded")
+  verifyOtp(
+    @Body() verifyOtpDto: VerifyOtpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.verifyOtp(verifyOtpDto, res);
+  }
+
+  @Post("login")
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes("application/x-www-form-urlencoded")
+  login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    return this.authService.login(loginDto, res);
+  }
+
+  @Post("logout")
+  @UseGuards(RbacGuard)
+  @HttpCode(HttpStatus.OK)
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = (req as any).user;
+    if (!user || !user.id) {
+      throw new UnauthorizedException("کاربر احراز هویت نشده است");
+    }
+    return this.authService.logout(user.id, res);
+  }
+
+  @Post("forgot-password")
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes("application/x-www-form-urlencoded")
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post("reset-password")
+  @HttpCode(HttpStatus.OK)
+  @ApiConsumes("application/x-www-form-urlencoded")
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
+  }
+}
