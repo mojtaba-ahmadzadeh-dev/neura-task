@@ -8,11 +8,11 @@ import {
   JoinTable,
 } from "typeorm";
 import { PermissionEntity } from "./permission.entity";
+import { BaseEntity } from "../../../common/abestract/base.entity";
+import { EntityNames } from "../../../common/enums/entity.enum";
 
-@Entity("roles")
-export class RoleEntity {
-  @PrimaryGeneratedColumn("increment")
-  id: number;
+@Entity(EntityNames.Roles)
+export class RoleEntity extends BaseEntity {
   @Column({
     unique: true,
   })

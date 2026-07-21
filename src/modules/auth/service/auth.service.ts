@@ -25,6 +25,7 @@ import * as bcrypt from "bcrypt";
 import { RoleEntity } from "src/modules/rbac/entities/role.entity";
 import type { Response } from "express";
 import { MailService } from "src/modules/mail/mail.service";
+import { deleteInvalidPropertyObject } from "src/common/utils/function.utils";
 
 @Injectable()
 export class AuthService {
@@ -43,10 +44,12 @@ export class AuthService {
     const { method, phone, email, password } = dto;
 
     if (method === RegisterMethod.PHONE && !phone) {
+      deleteInvalidPropertyObject(dto, ["email", "password"]);
       throw new BadRequestException("شماره موبایل الزامی است");
     }
 
     if (method === RegisterMethod.EMAIL && (!email || !password)) {
+      deleteInvalidPropertyObject(dto, ["phone"]);
       throw new BadRequestException("ایمیل و رمز عبور الزامی است");
     }
 
@@ -169,8 +172,10 @@ export class AuthService {
 
     // به‌روزرسانی وضعیت تأیید
     if (method === RegisterMethod.PHONE) {
+      deleteInvalidPropertyObject(dto, ["email"]);
       user.isPhoneVerified = true;
     } else {
+      deleteInvalidPropertyObject(dto, ["phone"]);
       user.isEmailVerified = true;
     }
 
@@ -199,60 +204,110 @@ export class AuthService {
     };
   }
   async login(dto: LoginDto, res: Response) {
-    const { email, password } = dto;
+    const { method, phone, email, password, code } = dto;
 
-    const user = await this.userRepository.findOne({
-      where: { email },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-        isEmailVerified: true,
-        roleId: true,
-        isActive: true,
-        phone: true,
-        isPhoneVerified: true,
-      },
-    });
+    if (method === RegisterMethod.PHONE) {
+      deleteInvalidPropertyObject(dto, ["email", "password"]);
 
-    if (!user) {
-      throw new UnauthorizedException("ایمیل یا رمز عبور اشتباه است");
+      if (!phone) {
+        throw new BadRequestException("شماره موبایل الزامی است");
+      }
+
+      const user = await this.userRepository.findOne({ where: { phone } });
+      if (!user) {
+        throw new NotFoundException("کاربری با این شماره موبایل یافت نشد");
+      }
+
+      if (!user.isActive) {
+        throw new UnauthorizedException("حساب کاربری شما غیرفعال شده است");
+      }
+
+      // 🟢 حالت اول: کد ارسال نشده -> باید یه OTP جدید بسازیم و بفرستیم
+      if (!code) {
+        const otpCode = randomInt(100000, 999999).toString();
+        const expiresInDate = new Date(Date.now() + 2 * 60 * 1000);
+
+        await this.otpRepository.save({
+          userId: user.id,
+          code: otpCode,
+          expiresIn: expiresInDate,
+        });
+
+        console.log(`📱 کد تأیید ورود ${phone}: ${otpCode}`);
+
+        return {
+          message: "کد تأیید با موفقیت ارسال شد",
+        };
+      }
+
+      // 🟢 حالت دوم: کد وارد شده -> verifyOtp رو صدا می‌زنیم
+      return this.verifyOtp(
+        { method: RegisterMethod.PHONE, phone, code } as VerifyOtpDto,
+        res,
+      );
     }
 
-    if (!user.isActive) {
-      throw new UnauthorizedException("حساب کاربری شما غیرفعال شده است");
+    if (method === RegisterMethod.EMAIL) {
+      deleteInvalidPropertyObject(dto, ["phone", "code"]);
+
+      if (!email || !password) {
+        throw new BadRequestException("ایمیل و رمز عبور الزامی است");
+      }
+
+      const user = await this.userRepository.findOne({
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+          isEmailVerified: true,
+          roleId: true,
+          isActive: true,
+          phone: true,
+          isPhoneVerified: true,
+        },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException("ایمیل یا رمز عبور اشتباه است");
+      }
+
+      if (!user.isActive) {
+        throw new UnauthorizedException("حساب کاربری شما غیرفعال شده است");
+      }
+
+      if (!user.isEmailVerified) {
+        throw new UnauthorizedException("لطفاً ابتدا ایمیل خود را تأیید کنید");
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password!);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException("ایمیل یا رمز عبور اشتباه است");
+      }
+
+      const tokens = await this.tokenService.generateTokens(
+        user.id,
+        user.roleId,
+      );
+
+      res.clearCookie("access_token");
+      res.clearCookie("refresh_token");
+
+      this.setAuthCookies(res, tokens);
+
+      return {
+        message: "ورود با موفقیت انجام شد",
+        user: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          isEmailVerified: user.isEmailVerified,
+          isPhoneVerified: user.isPhoneVerified,
+        },
+      };
     }
 
-    if (!user.isEmailVerified) {
-      throw new UnauthorizedException("لطفاً ابتدا ایمیل خود را تأیید کنید");
-    }
-
-    // بررسی رمز عبور
-    const isPasswordValid = await bcrypt.compare(password, user.password!);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException("ایمیل یا رمز عبور اشتباه است");
-    }
-
-    // تولید توکن‌ها
-    const tokens = await this.tokenService.generateTokens(user.id, user.roleId);
-
-    // پاک کردن کوکی‌های قبلی
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token");
-
-    // تنظیم کوکی‌های جدید
-    this.setAuthCookies(res, tokens);
-
-    return {
-      message: "ورود با موفقیت انجام شد",
-      user: {
-        id: user.id,
-        email: user.email,
-        phone: user.phone,
-        isEmailVerified: user.isEmailVerified,
-        isPhoneVerified: user.isPhoneVerified,
-      },
-    };
+    throw new BadRequestException("روش ورود نامعتبر است");
   }
   async refreshToken(refreshToken: string, res: Response) {
     if (!refreshToken) {

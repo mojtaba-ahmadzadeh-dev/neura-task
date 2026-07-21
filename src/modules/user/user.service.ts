@@ -157,7 +157,6 @@ export class UserService {
       data: updatedUser,
     };
   }
-
   private extractKeyFromUrl(url: string): string | null {
     try {
       const parsed = new URL(url);
@@ -166,5 +165,4 @@ export class UserService {
       return null;
     }
   }
-  
 }

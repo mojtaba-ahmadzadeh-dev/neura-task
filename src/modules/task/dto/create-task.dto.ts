@@ -7,7 +7,7 @@ import {
   IsNumber,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { TaskPriority, TaskStatus } from "../entities/task.entity";
+import { TaskPriority, TaskStatus } from "src/common/enums/task.status.enum";
 
 export class CreateTaskDto {
   @ApiProperty({

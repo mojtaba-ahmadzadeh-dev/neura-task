@@ -7,11 +7,11 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { RoleEntity } from "./role.entity";
+import { BaseEntity } from "../../../common/abestract/base.entity";
+import { EntityNames } from "../../../common/enums/entity.enum";
 
-@Entity("permissions")
-export class PermissionEntity  {
-    @PrimaryGeneratedColumn("increment")
-    id: number
+@Entity(EntityNames.Permissions)
+export class PermissionEntity extends BaseEntity {
   @Column({
     unique: true,
   })

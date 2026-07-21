@@ -1,35 +1,8 @@
-export const deleteInvalidPropertyObject = <T extends Record<string, any>>(
-  data: T,
-  blackList: any[] = [],
-): T => {
-  (Object.keys(data) as (keyof T)[]).forEach((key) => {
-    let value = data[key];
-
-    if (typeof value === "string") {
-      value = value.trim();
-      data[key] = value;
-    }
-
-    if (value === undefined || value === null) {
-      Reflect.deleteProperty(data, key);
-      return;
-    }
-
-    if (typeof value === "string" && value === "") {
-      Reflect.deleteProperty(data, key);
-      return;
-    }
-
-    if (typeof value === "number" && Number.isNaN(value)) {
-      Reflect.deleteProperty(data, key);
-      return;
-    }
-
-    if (blackList.includes(value)) {
-      Reflect.deleteProperty(data, key);
-      return;
-    }
+export const deleteInvalidPropertyObject = (data = {}, blackList = []) => {
+  const nullList = [undefined, null, "", " ", NaN, 0, false];
+  Object.keys(data).forEach((key) => {
+    if (blackList.includes(data[key])) Reflect.deleteProperty(data, key);
+    if (typeof data[key] === "string") data[key] = data[key].trim();
+    if (nullList.includes(data[key])) Reflect.deleteProperty(data, key);
   });
-
-  return data;
 };
