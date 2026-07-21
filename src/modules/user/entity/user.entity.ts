@@ -3,7 +3,9 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -12,6 +14,7 @@ import { OtpEntity } from "./otp.entity";
 import { RoleEntity } from "src/modules/rbac/entities/role.entity";
 import { EntityNames } from "../../../common/enums/entity.enum";
 import { BaseEntity } from "../../../common/abestract/base.entity";
+import { ProjectEntity } from "src/modules/projects/entities/project.entity";
 
 @Entity(EntityNames.User)
 export class UserEntity extends BaseEntity {
@@ -48,4 +51,8 @@ export class UserEntity extends BaseEntity {
   @OneToOne(() => OtpEntity, (otp) => otp.user)
   @JoinColumn()
   otp: OtpEntity;
+  @OneToMany(() => ProjectEntity, (project) => project.owner)
+  ownedProjects: ProjectEntity[];
+  @ManyToMany(() => ProjectEntity, (project) => project.members)
+  projects: ProjectEntity[];
 }

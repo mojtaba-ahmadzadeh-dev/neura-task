@@ -14,6 +14,7 @@ import {
   TaskStatus,
 } from "../../../common/enums/task.status.enum";
 import { BaseEntity } from "../../../common/abestract/base.entity";
+import { ProjectEntity } from "src/modules/projects/entities/project.entity";
 
 @Entity(EntityNames.Tasks)
 export class TaskEntity extends BaseEntity {
@@ -44,4 +45,10 @@ export class TaskEntity extends BaseEntity {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @ManyToOne(() => ProjectEntity, (project) => project.tasks, {
+    nullable: false,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "projectId" })
+  project: ProjectEntity;
 }

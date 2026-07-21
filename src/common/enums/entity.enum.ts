@@ -4,4 +4,5 @@ export enum EntityNames {
   Otp = "otp",
   Roles = "roles",
   Permissions = "permissions",
+  Projects = "projects"
 }
