@@ -66,7 +66,6 @@ export class RbacService {
   }
 
   async createRole(dto: CreateRoleDto) {
-    // چک کردن وجود نقش قبلی
     const existing = await this.roleRepository.findOne({
       where: { name: dto.name },
     });
@@ -77,7 +76,6 @@ export class RbacService {
 
     const role = this.roleRepository.create({
       name: dto.name,
-      // description: dto.description, اگر فیلد description داری
     });
 
     return await this.roleRepository.save(role);
