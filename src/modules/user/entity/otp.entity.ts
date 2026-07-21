@@ -1,10 +1,10 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
+import { EntityNames } from "../../../common/enums/entity.enum";
+import { BaseEntity } from "../../../common/abestract/base.entity";
 
-@Entity("otp")
-export class OtpEntity {
-  @PrimaryGeneratedColumn("increment")
-  id: number;
+@Entity(EntityNames.Otp)
+export class OtpEntity extends BaseEntity {
   @Column()
   code: string;
   @Column()

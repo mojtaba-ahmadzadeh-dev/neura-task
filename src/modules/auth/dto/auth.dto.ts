@@ -67,18 +67,36 @@ export class VerifyOtpDto {
 }
 
 export class LoginDto {
-  @ApiProperty({ example: "user@example.com" })
+  @ApiProperty({ enum: RegisterMethod, example: "email" })
+  @IsEnum(RegisterMethod)
+  @IsNotEmpty()
+  method: RegisterMethod;
+
+  @ApiProperty({ required: false, example: "09123456789" })
+  @IsOptional()
+  @IsPhoneNumber("IR")
+  @ValidateIf((o) => o.method === RegisterMethod.PHONE)
+  phone?: string;
+
+  @ApiProperty({ required: false, example: "user@example.com" })
+  @IsOptional()
   @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  @ValidateIf((o) => o.method === RegisterMethod.EMAIL)
+  email?: string;
 
-  @ApiProperty({ example: "StrongPass123" })
+  @ApiProperty({ required: false, example: "StrongPass123" })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MinLength(8)
-  password: string;
-}
+  @ValidateIf((o) => o.method === RegisterMethod.EMAIL)
+  password?: string;
 
+  @ApiProperty({ required: false, example: "123456" })
+  @IsOptional()
+  @IsString()
+  @ValidateIf((o) => o.method === RegisterMethod.PHONE)
+  code?: string;
+}
 export class ForgotPasswordDto {
   @ApiProperty({ example: "user@example.com" })
   @IsEmail()

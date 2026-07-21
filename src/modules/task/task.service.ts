@@ -9,6 +9,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { TaskEntity } from "./entities/task.entity";
 import { Repository } from "typeorm";
 import { UserEntity } from "../user/entity/user.entity";
+import { AuthMessage, TaskMessage } from "src/common/enums/message.enum";
 
 @Injectable()
 export class TaskService {
@@ -20,19 +21,27 @@ export class TaskService {
   ) {}
 
   async create(createTaskDto: CreateTaskDto) {
-    const { title, description, dueDate, isCompleted, priority, status } =
+    const { title, description, dueDate, priority, status } =
       createTaskDto;
+
+    if (!title || title.trim().length === 0) {
+      throw new BadRequestException(TaskMessage.TASK_TITLE_REQUIRED);
+    }
 
     const task = this.taskRepository.create({
       title,
       description,
       dueDate,
-      isCompleted: isCompleted ?? false,
       priority,
       status,
     });
 
-    return await this.taskRepository.save(task);
+    const savedTask = await this.taskRepository.save(task);
+
+    return {
+      message: TaskMessage.TASK_CREATED_SUCCESSFULLY,
+      data: savedTask,
+    };
   }
   async findAll() {
     return await this.taskRepository.find({
@@ -44,7 +53,7 @@ export class TaskService {
       where: { id },
     });
     if (!task) {
-      throw new NotFoundException(`تسک با آیدی ${id} پیدا نشد`);
+      throw new NotFoundException(TaskMessage.TASK_NOT_FOUND);
     }
     return task;
   }
@@ -56,16 +65,20 @@ export class TaskService {
   async assignTask(taskId: number, assigneeId: number) {
     const task = await this.findOne(taskId);
 
-    // چک کردن وجود کاربر قبل از assign
     const userExists = await this.userRepository.findOne({
       where: { id: assigneeId },
     });
 
     if (!userExists) {
-      throw new BadRequestException(`کاربر با آیدی ${assigneeId} وجود ندارد`);
+      throw new BadRequestException(AuthMessage.USER_NOT_FOUND);
     }
 
     task.assigneeId = assigneeId;
-    return await this.taskRepository.save(task);
+    const updatedTask = await this.taskRepository.save(task);
+
+    return {
+      message: TaskMessage.TASK_ASSIGNED_SUCCESSFULLY,
+      data: updatedTask,
+    };
   }
 }

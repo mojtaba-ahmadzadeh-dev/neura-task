@@ -36,3 +36,27 @@ export enum RbacMessages {
   PERMISSION_ALREADY_EXISTS = "این دسترسی قبلاً وجود دارد",
 }
 
+// task.messages.ts
+export enum TaskMessage {
+  // Success Messages
+  TASK_CREATED_SUCCESSFULLY = "تسک با موفقیت ایجاد شد",
+  TASK_UPDATED_SUCCESSFULLY = "تسک با موفقیت به‌روزرسانی شد",
+  TASK_DELETED_SUCCESSFULLY = "تسک با موفقیت حذف شد",
+  TASK_FETCHED_SUCCESSFULLY = "تسک با موفقیت دریافت شد",
+  TASKS_FETCHED_SUCCESSFULLY = "لیست تسک‌ها با موفقیت دریافت شد",
+  TASK_STATUS_UPDATED = "وضعیت تسک با موفقیت به‌روزرسانی شد",
+  TASK_PRIORITY_UPDATED = "اولویت تسک با موفقیت به‌روزرسانی شد",
+  TASK_ASSIGNED_SUCCESSFULLY = "تسک با موفقیت به کاربر اختصاص داده شد",
+
+  // Error Messages
+  TASK_NOT_FOUND = "تسک مورد نظر پیدا نشد",
+  TASK_ALREADY_EXISTS = "تسکی با این عنوان قبلاً وجود دارد",
+  INVALID_TASK_STATUS = "وضعیت تسک نامعتبر است",
+  INVALID_TASK_PRIORITY = "اولویت تسک نامعتبر است",
+  TASK_DUE_DATE_INVALID = "تاریخ سررسید نامعتبر است",
+  TASK_TITLE_REQUIRED = "عنوان تسک الزامی است",
+  TASK_ASSIGNEE_NOT_FOUND = "کاربر assignee مورد نظر یافت نشد",
+  CANNOT_UPDATE_COMPLETED_TASK = "امکان به‌روزرسانی تسک انجام‌شده وجود ندارد",
+  CANNOT_DELETE_COMPLETED_TASK = "امکان حذف تسک انجام‌شده وجود ندارد",
+  TASK_ALREADY_COMPLETED = "این تسک قبلاً انجام شده است",
+}

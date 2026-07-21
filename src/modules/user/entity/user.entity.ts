@@ -10,11 +10,11 @@ import {
 } from "typeorm";
 import { OtpEntity } from "./otp.entity";
 import { RoleEntity } from "src/modules/rbac/entities/role.entity";
+import { EntityNames } from "../../../common/enums/entity.enum";
+import { BaseEntity } from "../../../common/abestract/base.entity";
 
-@Entity("users")
-export class UserEntity {
-  @PrimaryGeneratedColumn("increment")
-  id: number;
+@Entity(EntityNames.User)
+export class UserEntity extends BaseEntity {
   @Column({ nullable: true })
   firstName: string;
   @Column({ nullable: true })
@@ -39,14 +39,6 @@ export class UserEntity {
   role: RoleEntity;
   @Column({ default: false })
   isEmailVerified: boolean;
-  @Column({ nullable: true })
-  emailVerificationToken?: string;
-  @Column({ nullable: true, type: "timestamp" })
-  emailVerificationExpires?: Date;
-  @Column({ nullable: true })
-  resetPasswordToken?: string;
-  @Column({ nullable: true, type: "timestamp" })
-  resetPasswordExpires?: Date;
   @Column({ default: true })
   isActive: boolean;
   @CreateDateColumn()
