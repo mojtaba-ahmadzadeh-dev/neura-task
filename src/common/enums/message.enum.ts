@@ -3,7 +3,6 @@ export enum AuthMessage {
   OTP_SENT_SUCCESS = "کد تأیید با موفقیت ارسال شد",
   OTP_VERIFIED_SUCCESS = "کد تأیید با موفقیت تأیید شد",
   EMAIL_VERIFIED_SUCCESS = "ایمیل با موفقیت تایید شد",
-
   // Error Messages
   PHONE_AND_CODE_REQUIRED = "شماره تلفن و کد تأیید الزامی است",
   USER_NOT_FOUND = "کاربر یافت نشد",
@@ -34,9 +33,13 @@ export enum RbacMessages {
   NOTFOUND_ROLE = "نقش مورد نظر یافت نشد",
   NOTFOUND_PERMISSION = "دسترسی مورد نظر یافت نشد",
   PERMISSION_ALREADY_EXISTS = "این دسترسی قبلاً وجود دارد",
+  UNAUTHORIZED = "لطفا ابتدا وارد شوید",
+  INVALID_TOKEN = "توکن نامعتبر یا منقضی شده است",
+  INVALID_TOKEN_PAYLOAD = "اطلاعات توکن نامعتبر است",
+  USER_NOT_FOUND = "کاربر یافت نشد",
+  FORBIDDEN = "شما دسترسی به این عملیات ندارید",
 }
 
-// task.messages.ts
 export enum TaskMessage {
   // Success Messages
   TASK_CREATED_SUCCESSFULLY = "تسک با موفقیت ایجاد شد",
@@ -47,7 +50,6 @@ export enum TaskMessage {
   TASK_STATUS_UPDATED = "وضعیت تسک با موفقیت به‌روزرسانی شد",
   TASK_PRIORITY_UPDATED = "اولویت تسک با موفقیت به‌روزرسانی شد",
   TASK_ASSIGNED_SUCCESSFULLY = "تسک با موفقیت به کاربر اختصاص داده شد",
-
   // Error Messages
   TASK_NOT_FOUND = "تسک مورد نظر پیدا نشد",
   TASK_ALREADY_EXISTS = "تسکی با این عنوان قبلاً وجود دارد",
@@ -59,4 +61,20 @@ export enum TaskMessage {
   CANNOT_UPDATE_COMPLETED_TASK = "امکان به‌روزرسانی تسک انجام‌شده وجود ندارد",
   CANNOT_DELETE_COMPLETED_TASK = "امکان حذف تسک انجام‌شده وجود ندارد",
   TASK_ALREADY_COMPLETED = "این تسک قبلاً انجام شده است",
+}
+
+export enum ProjectMessages {
+  USER_UNAUTHORIZED = "کاربر احراز هویت نشده است",
+  USER_NOT_FOUND = "کاربر یافت نشد",
+  WORKSPACE_NOT_FOUND = "ورک‌اسپیس یافت نشد",
+  PROJECT_NOT_FOUND = "پروژه یافت نشد",
+  PROJECT_CREATED_SUCCESSFULLY = "پروژه با موفقیت ایجاد شد",
+  PROJECT_UPDATED_SUCCESSFULLY = "پروژه با موفقیت به‌روزرسانی شد",
+  PROJECT_DELETED_SUCCESSFULLY = "پروژه با موفقیت حذف شد",
+  ERROR_CREATING_PROJECT = "خطا در ایجاد پروژه",
+  ERROR_UPDATING_PROJECT = "خطا در ویرایش پروژه",
+  ERROR_DELETING_PROJECT = "خطا در حذف پروژه",
+  ERROR_FETCHING_PROJECT = "خطا در دریافت پروژه",
+  ERROR_FETCHING_PROJECTS = "خطا در دریافت لیست پروژه‌ها",
+  INVALID_DATA = "داده‌های ارسالی نامعتبر است",
 }

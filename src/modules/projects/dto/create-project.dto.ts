@@ -1,4 +1,3 @@
-// dto/create-project.dto.ts
 import { IsNotEmpty, IsOptional, IsString, IsNumber, MaxLength, MinLength, IsUUID } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";

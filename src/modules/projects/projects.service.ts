@@ -19,6 +19,7 @@ import {
 } from "src/common/utils/pagination.utils";
 import { Workspace } from "../workspace/entities/workspace.entity";
 import { UpdateProjectDto } from "./dto/update-project.dto";
+import { ProjectMessages } from "src/common/enums/message.enum";
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProjectsService {
@@ -36,7 +37,7 @@ export class ProjectsService {
     try {
       const userId = this.request.user?.id;
       if (!userId) {
-        throw new ForbiddenException("کاربر احراز هویت نشده است");
+        throw new ForbiddenException(ProjectMessages.USER_UNAUTHORIZED);
       }
 
       const { title, description, workspaceId } = createProjectDto;
@@ -45,15 +46,16 @@ export class ProjectsService {
         where: { id: userId },
       });
       if (!user) {
-        throw new NotFoundException("کاربر یافت نشد");
+        throw new NotFoundException(ProjectMessages.USER_NOT_FOUND);
       }
 
       const workspace = await this.workspaceRepository.findOne({
         where: { id: workspaceId },
       });
       if (!workspace) {
-        throw new NotFoundException("ورک‌اسپیس یافت نشد");
+        throw new NotFoundException(ProjectMessages.WORKSPACE_NOT_FOUND);
       }
+
       const project = this.projectRepository.create({
         title,
         description: description || null,
@@ -78,7 +80,7 @@ export class ProjectsService {
         throw error;
       }
       throw new BadRequestException(
-        `خطا در ایجاد پروژه: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_CREATING_PROJECT}: ${error || "خطای ناشناخته"}`,
       );
     }
   }
@@ -86,7 +88,7 @@ export class ProjectsService {
     try {
       const userId = this.request.user?.id;
       if (!userId) {
-        throw new ForbiddenException("کاربر احراز هویت نشده است");
+        throw new ForbiddenException(ProjectMessages.USER_UNAUTHORIZED);
       }
 
       const { page, limit, skip } = paginationSolver(filters);
@@ -128,15 +130,15 @@ export class ProjectsService {
         throw error;
       }
       throw new BadRequestException(
-        `خطا در دریافت لیست پروژه‌ها: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_CREATING_PROJECT} ${error || "خطای ناشناخته"}`,
       );
     }
   }
-  async findOne(id: number){
+  async findOne(id: number) {
     try {
       const userId = this.request.user?.id;
       if (!userId) {
-        throw new ForbiddenException("کاربر احراز هویت نشده است");
+        throw new ForbiddenException(ProjectMessages.USER_UNAUTHORIZED);
       }
 
       const project = await this.projectRepository.findOne({
@@ -147,7 +149,7 @@ export class ProjectsService {
       });
 
       if (!project) {
-        throw new NotFoundException("پروژه یافت نشد");
+        throw new NotFoundException(ProjectMessages.PROJECT_NOT_FOUND);
       }
 
       return project;
@@ -159,18 +161,15 @@ export class ProjectsService {
         throw error;
       }
       throw new BadRequestException(
-        `خطا در دریافت پروژه: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_FETCHING_PROJECT}: ${error || "خطای ناشناخته"}`,
       );
     }
   }
-  async update(
-    id: number,
-    updateProjectDto: UpdateProjectDto,
-  ): Promise<ProjectEntity> {
+  async update(id: number, updateProjectDto: UpdateProjectDto) {
     try {
       const userId = this.request.user?.id;
       if (!userId) {
-        throw new ForbiddenException("کاربر احراز هویت نشده است");
+        throw new ForbiddenException(ProjectMessages.USER_UNAUTHORIZED);
       }
 
       const project = await this.projectRepository.findOne({
@@ -181,7 +180,7 @@ export class ProjectsService {
       });
 
       if (!project) {
-        throw new NotFoundException("پروژه یافت نشد");
+        throw new NotFoundException(ProjectMessages.PROJECT_NOT_FOUND);
       }
 
       const { title, description, workspaceId } = updateProjectDto;
@@ -191,7 +190,7 @@ export class ProjectsService {
           where: { id: workspaceId },
         });
         if (!workspace) {
-          throw new NotFoundException("ورک‌اسپیس یافت نشد");
+          throw new NotFoundException(ProjectMessages.WORKSPACE_NOT_FOUND);
         }
         project.workspace = workspace;
         project.workspaceId = workspaceId;
@@ -221,7 +220,7 @@ export class ProjectsService {
         throw error;
       }
       throw new BadRequestException(
-        `خطا در ویرایش پروژه: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_UPDATING_PROJECT}: ${error || "خطای ناشناخته"}`,
       );
     }
   }
@@ -229,7 +228,7 @@ export class ProjectsService {
     try {
       const userId = this.request.user?.id;
       if (!userId) {
-        throw new ForbiddenException("کاربر احراز هویت نشده است");
+        throw new ForbiddenException(ProjectMessages.USER_UNAUTHORIZED);
       }
 
       const project = await this.projectRepository.findOne({
@@ -238,12 +237,14 @@ export class ProjectsService {
       });
 
       if (!project) {
-        throw new NotFoundException("پروژه یافت نشد");
+        throw new NotFoundException(ProjectMessages.PROJECT_NOT_FOUND);
       }
 
       await this.projectRepository.delete(id);
 
-      return { message: "پروژه با موفقیت حذف شد" };
+      return {
+        message: ProjectMessages.PROJECT_DELETED_SUCCESSFULLY,
+      };
     } catch (error) {
       if (
         error instanceof NotFoundException ||
@@ -252,7 +253,7 @@ export class ProjectsService {
         throw error;
       }
       throw new BadRequestException(
-        `خطا در حذف پروژه: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_DELETING_PROJECT}: ${error || "خطای ناشناخته"}`,
       );
     }
   }

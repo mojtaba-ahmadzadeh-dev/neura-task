@@ -29,7 +29,6 @@ export class AuthController {
 
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
-  @ApiConsumes("application/x-www-form-urlencoded")
   register(
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
@@ -39,7 +38,6 @@ export class AuthController {
 
   @Post("verify-otp")
   @HttpCode(HttpStatus.OK)
-  @ApiConsumes("application/x-www-form-urlencoded")
   verifyOtp(
     @Body() verifyOtpDto: VerifyOtpDto,
     @Res({ passthrough: true }) res: Response,
@@ -49,7 +47,6 @@ export class AuthController {
 
   @Post("login")
   @HttpCode(HttpStatus.OK)
-  @ApiConsumes("application/x-www-form-urlencoded")
   login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     return this.authService.login(loginDto, res);
   }
@@ -67,14 +64,12 @@ export class AuthController {
 
   @Post("forgot-password")
   @HttpCode(HttpStatus.OK)
-  @ApiConsumes("application/x-www-form-urlencoded")
   forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
   @Post("reset-password")
   @HttpCode(HttpStatus.OK)
-  @ApiConsumes("application/x-www-form-urlencoded")
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
   }

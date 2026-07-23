@@ -10,6 +10,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 import { UserRepository } from "src/modules/user/repository/user.repository";
 import { UserEntity } from "src/modules/user/entity/user.entity";
+import { RbacMessages } from "src/common/enums/message.enum";
 
 @Injectable()
 export class RbacGuard implements CanActivate {
@@ -36,7 +37,7 @@ export class RbacGuard implements CanActivate {
     }
 
     if (!accessToken) {
-      throw new UnauthorizedException("لطفا ابتدا وارد شوید");
+      throw new UnauthorizedException(RbacMessages.UNAUTHORIZED);
     }
 
     let payload: any;
@@ -45,17 +46,17 @@ export class RbacGuard implements CanActivate {
         secret: process.env.ACCESS_TOKEN_SECRET,
       });
     } catch (error) {
-      throw new UnauthorizedException("توکن نامعتبر یا منقضی شده است");
+      throw new UnauthorizedException(RbacMessages.INVALID_TOKEN);
     }
 
     const userId = payload.userId;
     if (!userId) {
-      throw new UnauthorizedException("اطلاعات توکن نامعتبر است");
+      throw new UnauthorizedException(RbacMessages.INVALID_TOKEN_PAYLOAD);
     }
 
     const user = await this.findUserWithPermissions(userId);
     if (!user) {
-      throw new UnauthorizedException("کاربر یافت نشد");
+      throw new UnauthorizedException(RbacMessages.USER_NOT_FOUND);
     }
 
     request.user = user;
@@ -76,7 +77,7 @@ export class RbacGuard implements CanActivate {
 
     if (!hasAllPermissions) {
       throw new ForbiddenException(
-        `شما دسترسی به این عملیات ندارید: ${requiredPermissions.join(", ")}`,
+        `${RbacMessages.FORBIDDEN}: ${requiredPermissions.join(", ")}`,
       );
     }
 
