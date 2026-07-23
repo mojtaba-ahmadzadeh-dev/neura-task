@@ -7,7 +7,7 @@ import {
   Scope,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Brackets, In, Repository } from "typeorm";
+import { Brackets, Repository } from "typeorm";
 import { REQUEST } from "@nestjs/core";
 import type { Request } from "express";
 import { CreateProjectDto, FindAllProjectsDto } from "./dto/create-project.dto";
@@ -32,7 +32,7 @@ export class ProjectsService {
     @Inject(REQUEST) private request: Request,
   ) {}
 
-  async create(createProjectDto: CreateProjectDto): Promise<ProjectEntity> {
+  async create(createProjectDto: CreateProjectDto) {
     try {
       const userId = this.request.user?.id;
       if (!userId) {
@@ -132,7 +132,7 @@ export class ProjectsService {
       );
     }
   }
-  async findOne(id: number): Promise<ProjectEntity> {
+  async findOne(id: number){
     try {
       const userId = this.request.user?.id;
       if (!userId) {
@@ -222,6 +222,37 @@ export class ProjectsService {
       }
       throw new BadRequestException(
         `خطا در ویرایش پروژه: ${error || "خطای ناشناخته"}`,
+      );
+    }
+  }
+  async remove(id: number) {
+    try {
+      const userId = this.request.user?.id;
+      if (!userId) {
+        throw new ForbiddenException("کاربر احراز هویت نشده است");
+      }
+
+      const project = await this.projectRepository.findOne({
+        where: { id },
+        relations: { workspace: true },
+      });
+
+      if (!project) {
+        throw new NotFoundException("پروژه یافت نشد");
+      }
+
+      await this.projectRepository.delete(id);
+
+      return { message: "پروژه با موفقیت حذف شد" };
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `خطا در حذف پروژه: ${error || "خطای ناشناخته"}`,
       );
     }
   }
