@@ -51,8 +51,6 @@ export class UserEntity extends BaseEntity {
   @OneToOne(() => OtpEntity, (otp) => otp.user)
   @JoinColumn()
   otp: OtpEntity;
-  @OneToMany(() => ProjectEntity, (project) => project.owner)
-  ownedProjects: ProjectEntity[];
   @ManyToMany(() => ProjectEntity, (project) => project.members)
   projects: ProjectEntity[];
 }

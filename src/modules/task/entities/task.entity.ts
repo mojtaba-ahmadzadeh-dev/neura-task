@@ -45,10 +45,4 @@ export class TaskEntity extends BaseEntity {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @ManyToOne(() => ProjectEntity, (project) => project.tasks, {
-    nullable: false,
-    onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "projectId" })
-  project: ProjectEntity;
 }
