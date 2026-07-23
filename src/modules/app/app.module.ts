@@ -10,6 +10,7 @@ import { UserModule } from "../user/user.module";
 import { RbacModule } from "../rbac/rbac.module";
 import { WorkspaceModule } from "../workspace/workspace.module";
 import { TaskModule } from "../task/task.module";
+import { ProjectsModule } from "../projects/projects.module";
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { TaskModule } from "../task/task.module";
     RbacModule,
     UserModule,
     WorkspaceModule,
-    TaskModule
+    TaskModule,
+    ProjectsModule
   ],
   controllers: [AppController],
   providers: [AppService],

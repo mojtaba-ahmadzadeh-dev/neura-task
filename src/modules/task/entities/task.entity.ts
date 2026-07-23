@@ -14,6 +14,7 @@ import {
   TaskStatus,
 } from "../../../common/enums/task.status.enum";
 import { BaseEntity } from "../../../common/abestract/base.entity";
+import { ProjectEntity } from "src/modules/projects/entities/project.entity";
 
 @Entity(EntityNames.Tasks)
 export class TaskEntity extends BaseEntity {
