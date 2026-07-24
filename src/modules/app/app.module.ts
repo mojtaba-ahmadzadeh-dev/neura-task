@@ -11,6 +11,7 @@ import { RbacModule } from "../rbac/rbac.module";
 import { WorkspaceModule } from "../workspace/workspace.module";
 import { TaskModule } from "../task/task.module";
 import { ProjectsModule } from "../projects/projects.module";
+import { CommentModule } from "../comment/comment.module";
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { ProjectsModule } from "../projects/projects.module";
     UserModule,
     WorkspaceModule,
     TaskModule,
-    ProjectsModule
+    ProjectsModule,
+    CommentModule
   ],
   controllers: [AppController],
   providers: [AppService],

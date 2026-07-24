@@ -15,6 +15,7 @@ import { RoleEntity } from "src/modules/rbac/entities/role.entity";
 import { EntityNames } from "../../../common/enums/entity.enum";
 import { BaseEntity } from "../../../common/abestract/base.entity";
 import { ProjectEntity } from "src/modules/projects/entities/project.entity";
+import { CommentEntity } from "src/modules/comment/entities/comment.entity";
 
 @Entity(EntityNames.User)
 export class UserEntity extends BaseEntity {
@@ -53,4 +54,6 @@ export class UserEntity extends BaseEntity {
   otp: OtpEntity;
   @ManyToMany(() => ProjectEntity, (project) => project.members)
   projects: ProjectEntity[];
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments: CommentEntity[];
 }
