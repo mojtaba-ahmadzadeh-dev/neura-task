@@ -1,4 +1,3 @@
-// src/modules/attachment/attachment.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -13,6 +12,12 @@ import { S3Service } from "../s3/s3.service";
 import { AttachmentEntity } from "./entities/attachment.entity";
 import { REQUEST } from "@nestjs/core";
 import type { Request } from "express";
+import { PaginationDto } from "src/common/dto/pagination.dto";
+import {
+  paginationGenerator,
+  paginationSolver,
+} from "src/common/utils/pagination.utils";
+import { AttachmentMessage } from "src/common/enums/message.enum";
 
 @Injectable({ scope: Scope.REQUEST })
 export class AttachmentService {
@@ -28,13 +33,12 @@ export class AttachmentService {
     createAttachmentDto: CreateAttachmentDto,
   ): Promise<AttachmentEntity> {
     if (!file) {
-      throw new BadRequestException("فایلی ارسال نشده است");
+      throw new BadRequestException(AttachmentMessage.FILE_NOT_PROVIDED);
     }
 
     try {
       const uploaded = await this.s3Service.uploadFile(file, "attachments");
 
-      // گرفتن یوزر از ریکوئست
       const userId = (this.request as any).user?.id ?? null;
 
       const attachment = this.attachmentRepo.create({
@@ -48,21 +52,44 @@ export class AttachmentService {
 
       return await this.attachmentRepo.save(attachment);
     } catch (error) {
-      console.error("خطا در آپلود فایل به S3:", error);
-      throw new InternalServerErrorException("خطا در آپلود فایل");
+      throw new InternalServerErrorException(
+        AttachmentMessage.ERROR_UPLOADING_ATTACHMENT,
+      );
     }
   }
+  async findAll(paginationDto: PaginationDto) {
+    const { page, limit, skip } = paginationSolver(paginationDto);
 
+    const [attachments, count] = await this.attachmentRepo.findAndCount({
+      order: { id: "DESC" },
+      skip,
+      take: limit,
+    });
+
+    return {
+      attachments,
+      pagination: paginationGenerator(count, page, limit),
+    };
+  }
+  async findOne(id: number) {
+    const attachment = await this.attachmentRepo.findOneBy({ id });
+
+    if (!attachment) {
+      throw new BadRequestException(AttachmentMessage.ATTACHMENT_NOT_FOUND);
+    }
+
+    return attachment;
+  }
   async remove(id: number) {
     const attachment = await this.attachmentRepo.findOneBy({ id });
 
     if (!attachment) {
-      throw new BadRequestException("فایل پیدا نشد");
+      throw new BadRequestException(AttachmentMessage.ATTACHMENT_NOT_FOUND);
     }
 
     await this.s3Service.deleteFile(attachment.key);
     await this.attachmentRepo.remove(attachment);
 
-    return { message: "فایل با موفقیت حذف شد" };
+    return { message: AttachmentMessage.ATTACHMENT_DELETED_SUCCESSFULLY };
   }
 }
