@@ -1,4 +1,10 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex } from "typeorm";
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableColumn,
+  TableIndex,
+} from "typeorm";
 
 export class CreateCommentsTable1784842712318 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -46,22 +52,39 @@ export class CreateCommentsTable1784842712318 implements MigrationInterface {
           },
         ],
       }),
-      true
+      true,
+    );
+
+    await queryRunner.addColumn(
+      "comments",
+      new TableColumn({
+        name: "accepted",
+        type: "boolean",
+        isNullable: false,
+        default: false,
+      }),
     );
 
     // فقط ایندکس
-    await queryRunner.createIndex("comments", new TableIndex({
-      name: "IDX_comments_taskId",
-      columnNames: ["taskId"],
-    }));
+    await queryRunner.createIndex(
+      "comments",
+      new TableIndex({
+        name: "IDX_comments_taskId",
+        columnNames: ["taskId"],
+      }),
+    );
 
-    await queryRunner.createIndex("comments", new TableIndex({
-      name: "IDX_comments_userId",
-      columnNames: ["userId"],
-    }));
+    await queryRunner.createIndex(
+      "comments",
+      new TableIndex({
+        name: "IDX_comments_userId",
+        columnNames: ["userId"],
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable("comments", true);
+    await queryRunner.dropColumn("comments", "accepted");
   }
 }
