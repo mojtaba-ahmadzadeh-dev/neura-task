@@ -22,7 +22,7 @@ import { Pagination } from "src/common/decorators/pagination.decorator";
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @Post(":taskId/comments")
+  @Post(":taskId/create")
   async create(
     @Param("taskId", ParseIntPipe) taskId: number,
     @Body() createCommentDto: CreateCommentDto,
@@ -30,8 +30,8 @@ export class CommentController {
     return this.commentService.create(taskId, createCommentDto);
   }
 
-  @Get(":taskId/comments")
-  @Pagination() // decorator شما
+  @Get(":taskId")
+  @Pagination()
   async findAllTask(
     @Param("taskId", ParseIntPipe) taskId: number,
     @Query() paginationDto: PaginationDto,
@@ -50,8 +50,21 @@ export class CommentController {
     return this.commentService.findOne(id);
   }
 
-  @Delete(":id")
+  @Delete(":id/delete")
   async remove(@Param("id", ParseIntPipe) id: number) {
     return this.commentService.remove(id);
+  }
+
+  @Patch(":id/accept/admin")
+  accept(@Param("id", ParseIntPipe) id: number) {
+    return this.commentService.accept(id);
+  }
+
+  @Patch(":id/update")
+  update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateCommentDto: UpdateCommentDto,
+  ) {
+    return this.commentService.update(id, updateCommentDto);
   }
 }

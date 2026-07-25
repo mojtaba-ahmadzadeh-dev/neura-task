@@ -86,6 +86,8 @@ export enum CommentMessage {
   COMMENT_DELETED_SUCCESSFULLY = "کامنت با موفقیت حذف شد",
   COMMENT_FETCHED_SUCCESSFULLY = "کامنت با موفقیت دریافت شد",
   COMMENTS_FETCHED_SUCCESSFULLY = "لیست کامنت‌ها با موفقیت دریافت شد",
+  COMMENT_ACCEPTED_SUCCESSFULLY = "کامنت با موفقیت تایید شد",
+  COMMENT_REJECTED_SUCCESSFULLY = "تایید کامنت لغو شد",
   // Error Messages
   USER_UNAUTHORIZED = "کاربر احراز هویت نشده است",
   TASK_NOT_FOUND = "تسک مورد نظر پیدا نشد",

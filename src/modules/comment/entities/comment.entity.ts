@@ -11,6 +11,8 @@ export class CommentEntity extends BaseEntity {
   taskId: number;
   @Column()
   userId: number;
+  @Column({ default: false })
+  accepted: boolean;
   @Column({ nullable: true })
   parentId?: number;
   @ManyToOne(() => TaskEntity, (task) => task.comments, {
@@ -30,5 +32,5 @@ export class CommentEntity extends BaseEntity {
   @JoinColumn({ name: "parentId" })
   parent?: CommentEntity;
   @OneToMany(() => CommentEntity, (comment) => comment.parent)
-  replies: CommentEntity[];  
+  replies: CommentEntity[];
 }

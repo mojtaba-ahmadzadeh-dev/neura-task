@@ -4,6 +4,7 @@ import {
   Scope,
   NotFoundException,
   UnauthorizedException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -18,6 +19,7 @@ import {
 } from "src/common/utils/pagination.utils";
 import { PaginationDto } from "src/common/dto/pagination.dto";
 import { CommentMessage } from "src/common/enums/message.enum";
+import { UpdateCommentDto } from "./dto/update-comment.dto";
 
 @Injectable({ scope: Scope.REQUEST })
 export class CommentService {
@@ -51,6 +53,7 @@ export class CommentService {
       parentId,
       taskId,
       userId,
+      accepted: false,
       ...rest,
     });
 
@@ -60,6 +63,9 @@ export class CommentService {
     const { page, limit, skip } = paginationSolver(paginationDto);
 
     const [comments, totalCount] = await this.commentRepository.findAndCount({
+      where: {
+        accepted: true,
+      },
       relations: {
         user: true,
         task: true,
@@ -94,6 +100,7 @@ export class CommentService {
       where: {
         taskId,
         parentId: IsNull(),
+        accepted: true,
       },
       relations: {
         user: true,
@@ -117,7 +124,7 @@ export class CommentService {
   }
   async findOne(id: number) {
     const comment = await this.commentRepository.findOne({
-      where: { id },
+      where: { id, accepted: true },
       relations: {
         user: true,
         task: true,
@@ -145,6 +152,64 @@ export class CommentService {
 
     return {
       message: CommentMessage.COMMENT_DELETED_SUCCESSFULLY,
+    };
+  }
+  async accept(id: number) {
+    const userId = this.request.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedException(CommentMessage.USER_UNAUTHORIZED);
+    }
+
+    const comment = await this.commentRepository.findOne({
+      where: { id },
+    });
+
+    if (!comment) {
+      throw new NotFoundException(CommentMessage.COMMENT_NOT_FOUND);
+    }
+
+    comment.accepted = !comment.accepted;
+    await this.commentRepository.save(comment);
+
+    return {
+      message: comment.accepted
+        ? CommentMessage.COMMENT_ACCEPTED_SUCCESSFULLY
+        : CommentMessage.COMMENT_REJECTED_SUCCESSFULLY,
+      accepted: comment.accepted,
+    };
+  }
+  async update(id: number, updateCommentDto: UpdateCommentDto) {
+    const userId = this.request.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedException(CommentMessage.USER_UNAUTHORIZED);
+    }
+
+    const comment = await this.commentRepository.findOne({
+      where: { id },
+    });
+
+    if (!comment) {
+      throw new NotFoundException(CommentMessage.COMMENT_NOT_FOUND);
+    }
+
+    if (comment.userId !== userId) {
+      throw new ForbiddenException(CommentMessage.USER_UNAUTHORIZED);
+    }
+
+    const { content, ...rest } = updateCommentDto;
+
+    Object.assign(comment, {
+      ...(content !== undefined && { content }),
+      ...rest,
+    });
+
+    await this.commentRepository.save(comment);
+
+    return {
+      message: CommentMessage.COMMENT_UPDATED_SUCCESSFULLY,
+      data: comment,
     };
   }
 }
