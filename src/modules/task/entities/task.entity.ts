@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import {
   TaskPriority,
@@ -15,6 +16,7 @@ import {
 } from "../../../common/enums/task.status.enum";
 import { BaseEntity } from "../../../common/abestract/base.entity";
 import { ProjectEntity } from "src/modules/projects/entities/project.entity";
+import { CommentEntity } from "src/modules/comment/entities/comment.entity";
 
 @Entity(EntityNames.Tasks)
 export class TaskEntity extends BaseEntity {
@@ -45,4 +47,8 @@ export class TaskEntity extends BaseEntity {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @OneToMany(() => CommentEntity, (comment) => comment.task, {
+    cascade: true,
+  })
+  comments: CommentEntity[];
 }
