@@ -1,29 +1,39 @@
-import { Inject, Injectable, Scope, NotFoundException } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  Scope,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CommentEntity } from "./entities/comment.entity";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import { TaskEntity } from "../task/entities/task.entity";
 import { REQUEST } from "@nestjs/core";
 import type { Request } from "express";
+import {
+  paginationGenerator,
+  paginationSolver,
+} from "src/common/utils/pagination.utils";
+import { PaginationDto } from "src/common/dto/pagination.dto";
+import { CommentMessage } from "src/common/enums/message.enum";
 
 @Injectable({ scope: Scope.REQUEST })
 export class CommentService {
   constructor(
     @InjectRepository(CommentEntity)
     private commentRepository: Repository<CommentEntity>,
-
     @InjectRepository(TaskEntity)
     private taskRepository: Repository<TaskEntity>,
-
-    @Inject(REQUEST) private request: Request
+    @Inject(REQUEST) private request: Request,
   ) {}
 
   async create(taskId: number, createCommentDto: CreateCommentDto) {
-    const userId = this.request.user?.id
+    const userId = this.request.user?.id;
 
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new UnauthorizedException(CommentMessage.USER_UNAUTHORIZED);
     }
 
     const task = await this.taskRepository.findOne({
@@ -31,10 +41,9 @@ export class CommentService {
     });
 
     if (!task) {
-      throw new NotFoundException(`Task with ID ${taskId} not found`);
+      throw new NotFoundException(CommentMessage.TASK_NOT_FOUND);
     }
 
-    // destructuring DTO + اضافه کردن userId و taskId
     const { content, parentId, ...rest } = createCommentDto;
 
     const comment = this.commentRepository.create({
@@ -42,9 +51,100 @@ export class CommentService {
       parentId,
       taskId,
       userId,
-      ...rest, // اگر فیلدهای اضافی در آینده اضافه شد
+      ...rest,
     });
 
     return this.commentRepository.save(comment);
+  }
+  async findAll(paginationDto: PaginationDto) {
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const [comments, totalCount] = await this.commentRepository.findAndCount({
+      relations: {
+        user: true,
+        task: true,
+        parent: true,
+        replies: {
+          user: true,
+        },
+      },
+      order: {
+        id: "DESC",
+      },
+      skip,
+      take: limit,
+    });
+
+    const pagination = paginationGenerator(totalCount, page, limit);
+
+    return {
+      data: comments,
+      pagination,
+    };
+  }
+  async findAllByTask(taskId: number, paginationDto: PaginationDto) {
+    const task = await this.taskRepository.findOne({ where: { id: taskId } });
+    if (!task) {
+      throw new NotFoundException(CommentMessage.TASK_NOT_FOUND);
+    }
+
+    const { page, limit, skip } = paginationSolver(paginationDto);
+
+    const [comments, totalCount] = await this.commentRepository.findAndCount({
+      where: {
+        taskId,
+        parentId: IsNull(),
+      },
+      relations: {
+        user: true,
+        replies: {
+          user: true,
+        },
+      },
+      order: {
+        id: "DESC",
+      },
+      skip,
+      take: limit,
+    });
+
+    const pagination = paginationGenerator(totalCount, page, limit);
+
+    return {
+      data: comments,
+      pagination,
+    };
+  }
+  async findOne(id: number) {
+    const comment = await this.commentRepository.findOne({
+      where: { id },
+      relations: {
+        user: true,
+        task: true,
+        parent: true,
+        replies: {
+          user: true,
+        },
+      },
+    });
+
+    if (!comment) {
+      throw new NotFoundException(CommentMessage.COMMENT_NOT_FOUND);
+    }
+
+    return comment;
+  }
+  async remove(id: number) {
+    const comment = await this.commentRepository.findOne({ where: { id } });
+
+    if (!comment) {
+      throw new NotFoundException(CommentMessage.COMMENT_NOT_FOUND);
+    }
+
+    await this.commentRepository.remove(comment);
+
+    return {
+      message: CommentMessage.COMMENT_DELETED_SUCCESSFULLY,
+    };
   }
 }

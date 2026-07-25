@@ -78,3 +78,20 @@ export enum ProjectMessages {
   ERROR_FETCHING_PROJECTS = "خطا در دریافت لیست پروژه‌ها",
   INVALID_DATA = "داده‌های ارسالی نامعتبر است",
 }
+
+export enum CommentMessage {
+  // Success Messages
+  COMMENT_CREATED_SUCCESSFULLY = "کامنت با موفقیت ایجاد شد",
+  COMMENT_UPDATED_SUCCESSFULLY = "کامنت با موفقیت به‌روزرسانی شد",
+  COMMENT_DELETED_SUCCESSFULLY = "کامنت با موفقیت حذف شد",
+  COMMENT_FETCHED_SUCCESSFULLY = "کامنت با موفقیت دریافت شد",
+  COMMENTS_FETCHED_SUCCESSFULLY = "لیست کامنت‌ها با موفقیت دریافت شد",
+  // Error Messages
+  USER_UNAUTHORIZED = "کاربر احراز هویت نشده است",
+  TASK_NOT_FOUND = "تسک مورد نظر پیدا نشد",
+  COMMENT_NOT_FOUND = "کامنت مورد نظر پیدا نشد",
+  PARENT_COMMENT_NOT_FOUND = "کامنت والد پیدا نشد",
+  ERROR_CREATING_COMMENT = "خطا در ایجاد کامنت",
+  ERROR_UPDATING_COMMENT = "خطا در ویرایش کامنت",
+  ERROR_DELETING_COMMENT = "خطا در حذف کامنت",
+}
