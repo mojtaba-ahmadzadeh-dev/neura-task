@@ -12,6 +12,7 @@ import { WorkspaceModule } from "../workspace/workspace.module";
 import { TaskModule } from "../task/task.module";
 import { ProjectsModule } from "../projects/projects.module";
 import { CommentModule } from "../comment/comment.module";
+import { AttachmentModule } from "../attachment/attachment.module";
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { CommentModule } from "../comment/comment.module";
     WorkspaceModule,
     TaskModule,
     ProjectsModule,
-    CommentModule
+    CommentModule,
+    AttachmentModule
   ],
   controllers: [AppController],
   providers: [AppService],
