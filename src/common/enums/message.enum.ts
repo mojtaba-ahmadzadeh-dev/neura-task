@@ -97,3 +97,18 @@ export enum CommentMessage {
   ERROR_UPDATING_COMMENT = "خطا در ویرایش کامنت",
   ERROR_DELETING_COMMENT = "خطا در حذف کامنت",
 }
+
+export enum AttachmentMessage {
+  // Success Messages
+  ATTACHMENT_UPLOADED_SUCCESSFULLY = "فایل با موفقیت آپلود شد",
+  ATTACHMENT_FETCHED_SUCCESSFULLY = "فایل با موفقیت دریافت شد",
+  ATTACHMENTS_FETCHED_SUCCESSFULLY = "لیست فایل‌ها با موفقیت دریافت شد",
+  ATTACHMENT_DELETED_SUCCESSFULLY = "فایل با موفقیت حذف شد",
+  // Error Messages
+  FILE_NOT_PROVIDED = "فایلی ارسال نشده است",
+  ATTACHMENT_NOT_FOUND = "فایل مورد نظر پیدا نشد",
+  ERROR_UPLOADING_ATTACHMENT = "خطا در آپلود فایل",
+  ERROR_FETCHING_ATTACHMENT = "خطا در دریافت فایل",
+  ERROR_FETCHING_ATTACHMENTS = "خطا در دریافت لیست فایل‌ها",
+  ERROR_DELETING_ATTACHMENT = "خطا در حذف فایل",
+}
