@@ -23,6 +23,7 @@ import {
   paginationGenerator,
   paginationSolver,
 } from "src/common/utils/pagination.utils";
+import { AutomationMessage } from "src/common/enums/message.enum";
 
 @Injectable({ scope: Scope.REQUEST })
 export class AutomationService {
@@ -43,23 +44,21 @@ export class AutomationService {
       where: { id: dto.taskId },
     });
     if (!task) {
-      throw new NotFoundException("تسک مورد نظر یافت نشد");
+      throw new NotFoundException(AutomationMessage.TASK_NOT_FOUND);
     }
 
     const workspace = await this.workspaceRepository.findOne({
       where: { id: dto.workspaceId },
     });
     if (!workspace) {
-      throw new NotFoundException("ورک‌اسپیس مورد نظر یافت نشد");
+      throw new NotFoundException(AutomationMessage.WORKSPACE_NOT_FOUND);
     }
 
     if (
       dto.type === AutomationType.RECURRING &&
       (!dto.daysOfWeek || dto.daysOfWeek.length === 0)
     ) {
-      throw new BadRequestException(
-        "برای automation از نوع recurring مشخص کردن daysOfWeek الزامی است",
-      );
+      throw new BadRequestException(AutomationMessage.DAYS_OF_WEEK_REQUIRED);
     }
 
     const automation = this.automationRepository.create({
@@ -100,7 +99,7 @@ export class AutomationService {
     });
 
     if (!automation) {
-      throw new NotFoundException("automation مورد نظر یافت نشد");
+      throw new NotFoundException(AutomationMessage.AUTOMATION_NOT_FOUND);
     }
 
     return automation;
@@ -169,19 +168,19 @@ export class AutomationService {
     });
 
     if (!automation) {
-      throw new NotFoundException("automation مورد نظر یافت نشد");
+      throw new NotFoundException(AutomationMessage.AUTOMATION_NOT_FOUND);
     }
 
     await this.automationRepository.remove(automation);
 
     return {
-      message: "automation با موفقیت حذف شد",
+      message: AutomationMessage.AUTOMATION_DELETED_SUCCESSFULLY,
     };
   }
   private getUserId() {
     const user = (this.request as any).user;
     if (!user?.id) {
-      throw new ForbiddenException("کاربر احراز هویت نشده است");
+      throw new ForbiddenException(AutomationMessage.USER_UNAUTHORIZED);
     }
     return user.id;
   }
