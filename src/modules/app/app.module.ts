@@ -13,6 +13,7 @@ import { TaskModule } from "../task/task.module";
 import { ProjectsModule } from "../projects/projects.module";
 import { CommentModule } from "../comment/comment.module";
 import { AttachmentModule } from "../attachment/attachment.module";
+import { AutomationModule } from "../automation/automation.module";
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { AttachmentModule } from "../attachment/attachment.module";
     TaskModule,
     ProjectsModule,
     CommentModule,
-    AttachmentModule
+    AttachmentModule,
+    AutomationModule
   ],
   controllers: [AppController],
   providers: [AppService],

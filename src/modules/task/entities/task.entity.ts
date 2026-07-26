@@ -17,6 +17,7 @@ import {
 import { BaseEntity } from "../../../common/abestract/base.entity";
 import { ProjectEntity } from "src/modules/projects/entities/project.entity";
 import { CommentEntity } from "src/modules/comment/entities/comment.entity";
+import { AutomationEntity } from "src/modules/automation/entities/automation.entity";
 
 @Entity(EntityNames.Tasks)
 export class TaskEntity extends BaseEntity {
@@ -51,4 +52,8 @@ export class TaskEntity extends BaseEntity {
     cascade: true,
   })
   comments: CommentEntity[];
+  @OneToMany(() => AutomationEntity, (automation) => automation.task, {
+    cascade: false,
+  })
+  automations: AutomationEntity[];
 }

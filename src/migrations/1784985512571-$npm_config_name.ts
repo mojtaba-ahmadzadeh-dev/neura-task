@@ -2,7 +2,6 @@ import {
   MigrationInterface,
   QueryRunner,
   Table,
-  TableColumn,
   TableForeignKey,
   TableIndex,
 } from "typeorm";
@@ -43,7 +42,7 @@ export class CreateAttachmentTable1784985512571 implements MigrationInterface {
           },
           {
             name: "uploadedById",
-            type: "int",
+            type: "int",                 // ← باید با users.id یکی باشه (int)
             isNullable: true,
           },
           {
@@ -61,10 +60,10 @@ export class CreateAttachmentTable1784985512571 implements MigrationInterface {
       true,
     );
 
-    // Foreign Key
     await queryRunner.createForeignKey(
       "attachment",
       new TableForeignKey({
+        name: "FK_attachment_uploadedById",
         columnNames: ["uploadedById"],
         referencedTableName: "users",
         referencedColumnNames: ["id"],
