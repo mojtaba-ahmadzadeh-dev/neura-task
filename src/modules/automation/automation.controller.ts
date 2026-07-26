@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
   Query,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { AutomationService } from "./automation.service";
 import {
@@ -30,9 +31,27 @@ export class AutomationController {
     return this.automationService.create(createAutomationDto);
   }
 
-  @Get("/")
+  @Get("/all")
   @Pagination()
   findAll(@Query() filterDto: FilterAutomationDto) {
     return this.automationService.findAll(filterDto);
+  }
+
+  @Get("/:id")
+  findOne(@Param("id", ParseIntPipe) id: number) {
+    return this.automationService.findOne(id);
+  }
+
+  @Patch("/:id/update")
+  update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateAutomationDto: UpdateAutomationDto,
+  ) {
+    return this.automationService.update(id, updateAutomationDto);
+  }
+
+  @Delete("/:id/remove")
+  remove(@Param("id", ParseIntPipe) id: number) {
+    return this.automationService.remove(id);
   }
 }
