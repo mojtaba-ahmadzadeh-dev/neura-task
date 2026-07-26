@@ -12,6 +12,7 @@ import {
 import { UserEntity } from "src/modules/user/entity/user.entity";
 import { WorkspaceMember } from "./workspace-member.entity";
 import { ProjectEntity } from "src/modules/projects/entities/project.entity";
+import { AutomationEntity } from "src/modules/automation/entities/automation.entity";
 
 @Entity("workspaces")
 export class Workspace {
@@ -38,6 +39,8 @@ export class Workspace {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-    @OneToMany(() => ProjectEntity, (project) => project.workspace)
+  @OneToMany(() => ProjectEntity, (project) => project.workspace)
   projects: ProjectEntity[];
+  @OneToMany(() => AutomationEntity, (automation) => automation.workspace)
+  automations: AutomationEntity[];
 }

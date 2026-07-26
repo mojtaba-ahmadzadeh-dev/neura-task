@@ -112,3 +112,18 @@ export enum AttachmentMessage {
   ERROR_FETCHING_ATTACHMENTS = "خطا در دریافت لیست فایل‌ها",
   ERROR_DELETING_ATTACHMENT = "خطا در حذف فایل",
 }
+
+export enum AutomationMessage {
+  // Success Messages
+  AUTOMATION_CREATED_SUCCESSFULLY = "automation با موفقیت ایجاد شد",
+  AUTOMATION_UPDATED_SUCCESSFULLY = "automation با موفقیت به‌روزرسانی شد",
+  AUTOMATION_DELETED_SUCCESSFULLY = "automation با موفقیت حذف شد",
+  AUTOMATION_FETCHED_SUCCESSFULLY = "automation با موفقیت دریافت شد",
+  AUTOMATIONS_FETCHED_SUCCESSFULLY = "لیست automation ها با موفقیت دریافت شد",
+  // Error Messages
+  USER_UNAUTHORIZED = "کاربر احراز هویت نشده است",
+  TASK_NOT_FOUND = "تسک مورد نظر یافت نشد",
+  WORKSPACE_NOT_FOUND = "ورک‌اسپیس مورد نظر یافت نشد",
+  AUTOMATION_NOT_FOUND = "automation مورد نظر یافت نشد",
+  DAYS_OF_WEEK_REQUIRED = "برای automation از نوع recurring مشخص کردن daysOfWeek الزامی است",
+}

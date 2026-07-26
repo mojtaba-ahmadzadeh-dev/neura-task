@@ -16,6 +16,7 @@ import { EntityNames } from "../../../common/enums/entity.enum";
 import { BaseEntity } from "../../../common/abestract/base.entity";
 import { ProjectEntity } from "src/modules/projects/entities/project.entity";
 import { CommentEntity } from "src/modules/comment/entities/comment.entity";
+import { AutomationEntity } from "src/modules/automation/entities/automation.entity";
 
 @Entity(EntityNames.User)
 export class UserEntity extends BaseEntity {
@@ -56,4 +57,6 @@ export class UserEntity extends BaseEntity {
   projects: ProjectEntity[];
   @OneToMany(() => CommentEntity, (comment) => comment.user)
   comments: CommentEntity[];
+  @OneToMany(() => AutomationEntity, (automation) => automation.user)
+  automations: AutomationEntity[];
 }
