@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AutomationService } from "./automation.service";
 import { AutomationController } from "./automation.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AutomationEntity } from "./entities/automation.entity";
@@ -8,6 +7,8 @@ import { Workspace } from "../workspace/entities/workspace.entity";
 import { UserEntity } from "../user/entity/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { UserRepository } from "../user/repository/user.repository";
+import { AutomationService } from "./service/automation.service";
+import { AutomationCronService } from "./service/automation-cron.service";
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { UserRepository } from "../user/repository/user.repository";
     ]),
   ],
   controllers: [AutomationController],
-  providers: [AutomationService, JwtService, UserRepository],
+  providers: [AutomationService, JwtService, UserRepository, AutomationCronService],
 })
 export class AutomationModule {}

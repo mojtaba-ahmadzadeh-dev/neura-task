@@ -11,7 +11,6 @@ import {
   Query,
   ParseIntPipe,
 } from "@nestjs/common";
-import { AutomationService } from "./automation.service";
 import {
   CreateAutomationDto,
   FilterAutomationDto,
@@ -20,6 +19,7 @@ import { UpdateAutomationDto } from "./dto/update-automation.dto";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { RbacGuard } from "../rbac/guards/rbac.guard";
 import { Pagination } from "src/common/decorators/pagination.decorator";
+import { AutomationService } from "./service/automation.service";
 
 @Controller("automation")
 @UseGuards(RbacGuard)
