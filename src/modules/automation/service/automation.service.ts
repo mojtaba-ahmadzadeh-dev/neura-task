@@ -6,16 +6,9 @@ import {
   NotFoundException,
   Scope,
 } from "@nestjs/common";
-import {
-  CreateAutomationDto,
-  FilterAutomationDto,
-} from "./dto/create-automation.dto";
-import { UpdateAutomationDto } from "./dto/update-automation.dto";
+
 import { InjectRepository } from "@nestjs/typeorm";
-import { AutomationEntity } from "./entities/automation.entity";
 import { Repository } from "typeorm";
-import { TaskEntity } from "../task/entities/task.entity";
-import { Workspace } from "../workspace/entities/workspace.entity";
 import { AutomationType } from "src/common/enums/automation-type.enum";
 import { REQUEST } from "@nestjs/core";
 import type { Request } from "express";
@@ -24,6 +17,12 @@ import {
   paginationSolver,
 } from "src/common/utils/pagination.utils";
 import { AutomationMessage } from "src/common/enums/message.enum";
+import { calculateNextRunAt } from "src/common/utils/automation.utils";
+import { AutomationEntity } from "../entities/automation.entity";
+import { TaskEntity } from "src/modules/task/entities/task.entity";
+import { Workspace } from "src/modules/workspace/entities/workspace.entity";
+import { CreateAutomationDto, FilterAutomationDto } from "../dto/create-automation.dto";
+import { UpdateAutomationDto } from "../dto/update-automation.dto";
 
 @Injectable({ scope: Scope.REQUEST })
 export class AutomationService {
@@ -61,6 +60,8 @@ export class AutomationService {
       throw new BadRequestException(AutomationMessage.DAYS_OF_WEEK_REQUIRED);
     }
 
+    const timezone = dto.timezone ?? "Asia/Tehran";
+
     const automation = this.automationRepository.create({
       type: dto.type,
       taskId: dto.taskId,
@@ -69,8 +70,13 @@ export class AutomationService {
       active: dto.active ?? true,
       daysOfWeek: dto.type === AutomationType.RECURRING ? dto.daysOfWeek : [],
       timeOfDay: dto.timeOfDay,
-      timezone: dto.timezone ?? "Asia/Tehran",
-      nextRunAt: this.calculateNextRunAt(dto),
+      timezone,
+      nextRunAt: calculateNextRunAt({
+        timeOfDay: dto.timeOfDay,
+        daysOfWeek: dto.daysOfWeek,
+        timezone,
+        type: dto.type,
+      }),
     });
 
     return this.automationRepository.save(automation);
@@ -144,18 +150,23 @@ export class AutomationService {
       );
     }
 
+    const daysOfWeek =
+      type === AutomationType.RECURRING
+        ? (dto.daysOfWeek ?? automation.daysOfWeek)
+        : [];
+
     Object.assign(automation, {
       ...dto,
-      daysOfWeek:
-        type === AutomationType.RECURRING
-          ? (dto.daysOfWeek ?? automation.daysOfWeek)
-          : [],
+      daysOfWeek,
     });
 
-    if (dto.timeOfDay) {
-      automation.nextRunAt = this.calculateNextRunAt({
-        timeOfDay: dto.timeOfDay,
-      } as UpdateAutomationDto as CreateAutomationDto);
+    if (dto.timeOfDay || dto.daysOfWeek || dto.timezone || dto.type) {
+      automation.nextRunAt = calculateNextRunAt({
+        timeOfDay: dto.timeOfDay ?? automation.timeOfDay,
+        daysOfWeek,
+        timezone: dto.timezone ?? automation.timezone,
+        type,
+      });
     }
 
     return this.automationRepository.save(automation);
@@ -183,17 +194,5 @@ export class AutomationService {
       throw new ForbiddenException(AutomationMessage.USER_UNAUTHORIZED);
     }
     return user.id;
-  }
-  private calculateNextRunAt(dto: CreateAutomationDto): Date {
-    const [hours, minutes, seconds] = dto.timeOfDay.split(":").map(Number);
-    const now = new Date();
-    const next = new Date(now);
-    next.setHours(hours, minutes, seconds, 0);
-
-    if (next <= now) {
-      next.setDate(next.getDate() + 1);
-    }
-
-    return next;
   }
 }

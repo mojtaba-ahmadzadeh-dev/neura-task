@@ -14,6 +14,7 @@ import { ProjectsModule } from "../projects/projects.module";
 import { CommentModule } from "../comment/comment.module";
 import { AttachmentModule } from "../attachment/attachment.module";
 import { AutomationModule } from "../automation/automation.module";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AutomationModule } from "../automation/automation.module";
       useFactory: (configService: ConfigService) =>
         TypeOrmConfig(configService),
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     RbacModule,
     UserModule,
@@ -36,7 +38,7 @@ import { AutomationModule } from "../automation/automation.module";
     ProjectsModule,
     CommentModule,
     AttachmentModule,
-    AutomationModule
+    AutomationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
