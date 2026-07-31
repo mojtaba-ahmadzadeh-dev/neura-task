@@ -17,6 +17,7 @@ import { BaseEntity } from "../../../common/abestract/base.entity";
 import { ProjectEntity } from "src/modules/projects/entities/project.entity";
 import { CommentEntity } from "src/modules/comment/entities/comment.entity";
 import { AutomationEntity } from "src/modules/automation/entities/automation.entity";
+import { NotificationEntity } from "src/modules/notfication/entities/notfication.entity";
 
 @Entity(EntityNames.User)
 export class UserEntity extends BaseEntity {
@@ -59,4 +60,6 @@ export class UserEntity extends BaseEntity {
   comments: CommentEntity[];
   @OneToMany(() => AutomationEntity, (automation) => automation.user)
   automations: AutomationEntity[];
+  @OneToMany(() => NotificationEntity, (notification) => notification.receiver)
+  notifications: NotificationEntity[];
 }

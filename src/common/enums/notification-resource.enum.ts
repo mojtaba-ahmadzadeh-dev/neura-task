@@ -1,0 +1,9 @@
+export enum NotificationResource {
+  TASK = "TASK",
+  PROJECT = "PROJECT",
+  WORKSPACE = "WORKSPACE",
+  COMMENT = "COMMENT",
+  ATTACHMENT = "ATTACHMENT",
+  AUTOMATION = "AUTOMATION",
+  USER = "USER",
+}

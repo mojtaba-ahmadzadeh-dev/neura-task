@@ -15,6 +15,7 @@ import { CommentModule } from "../comment/comment.module";
 import { AttachmentModule } from "../attachment/attachment.module";
 import { AutomationModule } from "../automation/automation.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { NotficationModule } from "../notfication/notfication.module";
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     CommentModule,
     AttachmentModule,
     AutomationModule,
+    NotficationModule
   ],
   controllers: [AppController],
   providers: [AppService],

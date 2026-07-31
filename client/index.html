@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Socket Test</title>
+</head>
+<body>
+
+<h2>Notification Test</h2>
+
+<button onclick="join()">Join Room</button>
+<button onclick="test()">Test Notification</button>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+    const socket = io("http://localhost:3000/notifications");
+
+    socket.on("connect", () => {
+        console.log("Connected:", socket.id);
+    });
+
+    socket.on("joined", (data) => {
+        console.log("Joined:", data);
+    });
+
+    socket.on("notification:new", (data) => {
+        console.log("Notification:", data);
+        alert(data.title + "\n" + data.message);
+    });
+
+    function join() {
+        socket.emit("join", 1);
+    }
+
+    function test() {
+        fetch("http://localhost:3000/notifications/test", {
+            method: "POST",
+        });
+    }
+</script>
+
+</body>
+</html>
