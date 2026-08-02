@@ -26,7 +26,7 @@ import { MailService } from "../mail/mail.service";
     TokenService,
     JwtService,
     UserRepository,
-    MailService,
+    MailService
   ],
   exports: [AuthService],
 })
