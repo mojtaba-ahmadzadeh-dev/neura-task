@@ -10,19 +10,24 @@ import { TaskEntity } from "./entities/task.entity";
 import { Repository } from "typeorm";
 import { UserEntity } from "../user/entity/user.entity";
 import { AuthMessage, TaskMessage } from "src/common/enums/message.enum";
+import { InjectRedis } from "@nestjs-modules/ioredis";
+import Redis from "ioredis";
 
 @Injectable()
 export class TaskService {
+  private readonly CACHE_KEY = "tasks:all";
+  private readonly CACHE_TTL = 60;
+
   constructor(
     @InjectRepository(TaskEntity)
     private readonly taskRepository: Repository<TaskEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRedis() private readonly redis: Redis,
   ) {}
 
   async create(createTaskDto: CreateTaskDto) {
-    const { title, description, dueDate, priority, status } =
-      createTaskDto;
+    const { title, description, dueDate, priority, status } = createTaskDto;
 
     if (!title || title.trim().length === 0) {
       throw new BadRequestException(TaskMessage.TASK_TITLE_REQUIRED);
@@ -38,15 +43,32 @@ export class TaskService {
 
     const savedTask = await this.taskRepository.save(task);
 
+    await this.redis.del(this.CACHE_KEY);
+
     return {
       message: TaskMessage.TASK_CREATED_SUCCESSFULLY,
       data: savedTask,
     };
   }
   async findAll() {
-    return await this.taskRepository.find({
+    const cached = await this.redis.get(this.CACHE_KEY);
+
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const tasks = await this.taskRepository.find({
       order: { createdAt: "DESC" },
     });
+
+    await this.redis.set(
+      this.CACHE_KEY,
+      JSON.stringify(tasks),
+      "EX",
+      this.CACHE_TTL,
+    );
+
+    return tasks;
   }
   async findOne(id: number) {
     const task = await this.taskRepository.findOne({
