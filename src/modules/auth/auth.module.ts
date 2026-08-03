@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { AuthController } from "./auth.controller";
+import { AuthController } from "./controller/auth.controller";
 import { AuthService } from "./service/auth.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "../user/entity/user.entity";
@@ -10,6 +10,8 @@ import { RoleEntity } from "../rbac/entities/role.entity";
 import { PermissionEntity } from "../rbac/entities/permission.entity";
 import { UserRepository } from "../user/repository/user.repository";
 import { MailService } from "../mail/mail.service";
+import { GoogleAuthController } from "./controller/google.controller";
+import { GoogleStrategy } from "./strategy/google.strategy";
 
 @Module({
   imports: [
@@ -20,14 +22,15 @@ import { MailService } from "../mail/mail.service";
       PermissionEntity,
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, GoogleAuthController],
   providers: [
     AuthService,
     TokenService,
     JwtService,
     UserRepository,
-    MailService
+    MailService,
+    GoogleStrategy,
   ],
-  exports: [AuthService],
+  exports: [AuthService, GoogleStrategy],
 })
 export class AuthModule {}
