@@ -1,4 +1,3 @@
-// src/modules/auth/service/auth.service.ts
 import {
   BadRequestException,
   ConflictException,
@@ -11,7 +10,7 @@ import { Repository } from "typeorm";
 import { UserEntity } from "../../user/entity/user.entity";
 import { TokenService } from "./token.service";
 import { AuthMessage } from "src/common/enums/message.enum";
-import { randomInt } from "crypto";
+import { randomInt, randomUUID } from "crypto";
 import { OtpEntity } from "src/modules/user/entity/otp.entity";
 import {
   RegisterDto,
@@ -26,6 +25,7 @@ import { RoleEntity } from "src/modules/rbac/entities/role.entity";
 import type { Response } from "express";
 import { MailService } from "src/modules/mail/mail.service";
 import { deleteInvalidPropertyObject } from "src/common/utils/function.utils";
+import { GoogleUser } from "../types/payload";
 
 @Injectable()
 export class AuthService {
@@ -390,6 +390,104 @@ export class AuthService {
 
     return {
       message: "رمز عبور با موفقیت تغییر یافت",
+    };
+  }
+  async googleAuth(userData: GoogleUser, res: Response) {
+    const { email, firstName, lastName, profile_image } = userData;
+
+    let user = await this.userRepository.findOneBy({ email });
+
+    if (user) {
+      if (!user.isActive) {
+        throw new UnauthorizedException("حساب کاربری شما غیرفعال شده است");
+      }
+
+      const tokens = await this.tokenService.generateTokens(
+        user.id,
+        user.roleId,
+      );
+
+      res.clearCookie("access_token");
+      res.clearCookie("refresh_token");
+
+      this.setAuthCookies(res, tokens);
+
+      return {
+        message: "ورود با گوگل با موفقیت انجام شد",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatar: user.avatar,
+        },
+      };
+    }
+
+    const userCount = await this.userRepository.count();
+    const isFirstUser = userCount === 0;
+
+    let roleId: number;
+
+    if (isFirstUser) {
+      let adminRole = await this.roleRepository.findOne({
+        where: { name: "admin" },
+      });
+
+      if (!adminRole) {
+        adminRole = await this.roleRepository.save(
+          this.roleRepository.create({
+            name: "admin",
+            permissions: [],
+          }),
+        );
+      }
+      roleId = adminRole.id;
+    } else {
+      let userRole = await this.roleRepository.findOne({
+        where: { name: "user" },
+      });
+
+      if (!userRole) {
+        userRole = await this.roleRepository.save(
+          this.roleRepository.create({
+            name: "user",
+            permissions: [],
+          }),
+        );
+      }
+      roleId = userRole.id;
+    }
+
+    user = this.userRepository.create({
+      email,
+      firstName: firstName || null,
+      lastName: lastName || null,
+      avatar: profile_image || null,
+      isEmailVerified: true,
+      isPhoneVerified: false,
+      roleId,
+      isActive: true,
+    });
+
+    user = await this.userRepository.save(user);
+
+    const tokens = await this.tokenService.generateTokens(user.id, user.roleId);
+
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
+
+    this.setAuthCookies(res, tokens);
+
+    return {
+      message: "ثبت‌نام و ورود با گوگل با موفقیت انجام شد",
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatar: user.avatar,
+      },
     };
   }
   private setAuthCookies(

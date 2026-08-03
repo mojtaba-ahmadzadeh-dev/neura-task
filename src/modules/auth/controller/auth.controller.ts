@@ -10,17 +10,17 @@ import {
   UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
-import { AuthService } from "./service/auth.service";
+import { AuthService } from "../service/auth.service";
 import {
   ForgotPasswordDto,
   LoginDto,
   RegisterDto,
   ResetPasswordDto,
   VerifyOtpDto,
-} from "./dto/auth.dto";
-import { ApiConsumes, ApiTags } from "@nestjs/swagger";
+} from "../dto/auth.dto";
+import { ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
-import { RbacGuard } from "../rbac/guards/rbac.guard";
+import { RbacGuard } from "../../rbac/guards/rbac.guard";
 
 @Controller("auth")
 @ApiTags("Auth")
