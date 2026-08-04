@@ -82,7 +82,15 @@ export class TaskService {
   async update(id: number, updateTaskDto: UpdateTaskDto) {
     const task = await this.findOne(id);
     Object.assign(task, updateTaskDto);
-    return await this.taskRepository.save(task);
+
+    const updatedTask = await this.taskRepository.save(task);
+
+    await this.redis.del(this.CACHE_KEY);
+
+    return {
+      message: TaskMessage.TASK_UPDATED_SUCCESSFULLY,
+      data: updatedTask,
+    };
   }
   async assignTask(taskId: number, assigneeId: number) {
     const task = await this.findOne(taskId);
@@ -101,6 +109,17 @@ export class TaskService {
     return {
       message: TaskMessage.TASK_ASSIGNED_SUCCESSFULLY,
       data: updatedTask,
+    };
+  }
+  async remove(id: number) {
+    const task = await this.findOne(id);
+
+    await this.taskRepository.remove(task);
+
+    await this.redis.del(this.CACHE_KEY);
+
+    return {
+      message: TaskMessage.TASK_DELETED_SUCCESSFULLY,
     };
   }
 }
