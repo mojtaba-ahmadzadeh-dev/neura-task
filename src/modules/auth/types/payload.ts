@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 export type CookiePayload = {
   userId: number;
 };
@@ -16,9 +18,15 @@ export type PhoneTokenPayload = {
 };
 
 export type GoogleUser = {
-  firstName?: string
-  lastName?: string
-  email?: string
-  accessToken?: string
-  profile_image?: string
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  accessToken?: string;
+  profile_image?: string;
+};
+
+export interface AuthenticatedRequest extends Request {
+  user: {
+    id: number;
+  };
 }

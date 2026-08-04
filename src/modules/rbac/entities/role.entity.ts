@@ -1,15 +1,7 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-  JoinTable,
-} from "typeorm";
-import { PermissionEntity } from "./permission.entity";
-import { BaseEntity } from "../../../common/abestract/base.entity";
-import { EntityNames } from "../../../common/enums/entity.enum";
+import { Entity, Column, ManyToMany, CreateDateColumn, UpdateDateColumn, JoinTable } from 'typeorm';
+import { PermissionEntity } from './permission.entity';
+import { BaseEntity } from '../../../common/abestract/base.entity';
+import { EntityNames } from '../../../common/enums/entity.enum';
 
 @Entity(EntityNames.Roles)
 export class RoleEntity extends BaseEntity {
@@ -19,14 +11,14 @@ export class RoleEntity extends BaseEntity {
   name: string;
   @ManyToMany(() => PermissionEntity, (permission) => permission.roles)
   @JoinTable({
-    name: "role_permissions",
+    name: 'role_permissions',
     joinColumn: {
-      name: "roleId",
-      referencedColumnName: "id",
+      name: 'roleId',
+      referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: "permissionId",
-      referencedColumnName: "id",
+      name: 'permissionId',
+      referencedColumnName: 'id',
     },
   })
   permissions: PermissionEntity[];

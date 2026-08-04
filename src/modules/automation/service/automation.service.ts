@@ -5,24 +5,21 @@ import {
   Injectable,
   NotFoundException,
   Scope,
-} from "@nestjs/common";
+} from '@nestjs/common';
 
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { AutomationType } from "src/common/enums/automation-type.enum";
-import { REQUEST } from "@nestjs/core";
-import type { Request } from "express";
-import {
-  paginationGenerator,
-  paginationSolver,
-} from "src/common/utils/pagination.utils";
-import { AutomationMessage } from "src/common/enums/message.enum";
-import { calculateNextRunAt } from "src/common/utils/automation.utils";
-import { AutomationEntity } from "../entities/automation.entity";
-import { TaskEntity } from "src/modules/task/entities/task.entity";
-import { Workspace } from "src/modules/workspace/entities/workspace.entity";
-import { CreateAutomationDto, FilterAutomationDto } from "../dto/create-automation.dto";
-import { UpdateAutomationDto } from "../dto/update-automation.dto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AutomationType } from 'src/common/enums/automation-type.enum';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
+import { paginationGenerator, paginationSolver } from 'src/common/utils/pagination.utils';
+import { AutomationMessage } from 'src/common/enums/message.enum';
+import { calculateNextRunAt } from 'src/common/utils/automation.utils';
+import { AutomationEntity } from '../entities/automation.entity';
+import { TaskEntity } from 'src/modules/task/entities/task.entity';
+import { Workspace } from 'src/modules/workspace/entities/workspace.entity';
+import { CreateAutomationDto, FilterAutomationDto } from '../dto/create-automation.dto';
+import { UpdateAutomationDto } from '../dto/update-automation.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AutomationService {
@@ -53,14 +50,11 @@ export class AutomationService {
       throw new NotFoundException(AutomationMessage.WORKSPACE_NOT_FOUND);
     }
 
-    if (
-      dto.type === AutomationType.RECURRING &&
-      (!dto.daysOfWeek || dto.daysOfWeek.length === 0)
-    ) {
+    if (dto.type === AutomationType.RECURRING && (!dto.daysOfWeek || dto.daysOfWeek.length === 0)) {
       throw new BadRequestException(AutomationMessage.DAYS_OF_WEEK_REQUIRED);
     }
 
-    const timezone = dto.timezone ?? "Asia/Tehran";
+    const timezone = dto.timezone ?? 'Asia/Tehran';
 
     const automation = this.automationRepository.create({
       type: dto.type,
@@ -87,7 +81,7 @@ export class AutomationService {
 
     const [automations, count] = await this.automationRepository.findAndCount({
       where: { userId },
-      order: { id: "DESC" },
+      order: { id: 'DESC' },
       skip,
       take: limit,
     });
@@ -118,7 +112,7 @@ export class AutomationService {
     });
 
     if (!automation) {
-      throw new NotFoundException("automation مورد نظر یافت نشد");
+      throw new NotFoundException('automation مورد نظر یافت نشد');
     }
 
     if (dto.taskId) {
@@ -126,7 +120,7 @@ export class AutomationService {
         where: { id: dto.taskId },
       });
       if (!task) {
-        throw new NotFoundException("تسک مورد نظر یافت نشد");
+        throw new NotFoundException('تسک مورد نظر یافت نشد');
       }
     }
 
@@ -135,7 +129,7 @@ export class AutomationService {
         where: { id: dto.workspaceId },
       });
       if (!workspace) {
-        throw new NotFoundException("ورک‌اسپیس مورد نظر یافت نشد");
+        throw new NotFoundException('ورک‌اسپیس مورد نظر یافت نشد');
       }
     }
 
@@ -146,14 +140,12 @@ export class AutomationService {
       (dto.daysOfWeek ?? automation.daysOfWeek)?.length === 0
     ) {
       throw new BadRequestException(
-        "برای automation از نوع recurring مشخص کردن daysOfWeek الزامی است",
+        'برای automation از نوع recurring مشخص کردن daysOfWeek الزامی است',
       );
     }
 
     const daysOfWeek =
-      type === AutomationType.RECURRING
-        ? (dto.daysOfWeek ?? automation.daysOfWeek)
-        : [];
+      type === AutomationType.RECURRING ? (dto.daysOfWeek ?? automation.daysOfWeek) : [];
 
     Object.assign(automation, {
       ...dto,

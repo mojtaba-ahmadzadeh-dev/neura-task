@@ -1,54 +1,48 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  Table,
-  TableColumn,
-  TableIndex,
-} from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableColumn, TableIndex } from 'typeorm';
 
 export class CreateCommentsTable1784842712318 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("comments", true);
+    await queryRunner.dropTable('comments', true);
 
     await queryRunner.createTable(
       new Table({
-        name: "comments",
+        name: 'comments',
         columns: [
           {
-            name: "id",
-            type: "int",
+            name: 'id',
+            type: 'int',
             isPrimary: true,
             isGenerated: true,
-            generationStrategy: "increment",
+            generationStrategy: 'increment',
           },
           {
-            name: "content",
-            type: "text",
+            name: 'content',
+            type: 'text',
           },
           {
-            name: "taskId",
-            type: "int",
+            name: 'taskId',
+            type: 'int',
             isNullable: false,
           },
           {
-            name: "userId",
-            type: "int",
+            name: 'userId',
+            type: 'int',
             isNullable: false,
           },
           {
-            name: "parentId",
-            type: "int",
+            name: 'parentId',
+            type: 'int',
             isNullable: true,
           },
           {
-            name: "createdAt",
-            type: "timestamp",
-            default: "CURRENT_TIMESTAMP",
+            name: 'createdAt',
+            type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
           },
           {
-            name: "updatedAt",
-            type: "timestamp",
-            default: "CURRENT_TIMESTAMP",
+            name: 'updatedAt',
+            type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
           },
         ],
       }),
@@ -56,10 +50,10 @@ export class CreateCommentsTable1784842712318 implements MigrationInterface {
     );
 
     await queryRunner.addColumn(
-      "comments",
+      'comments',
       new TableColumn({
-        name: "accepted",
-        type: "boolean",
+        name: 'accepted',
+        type: 'boolean',
         isNullable: false,
         default: false,
       }),
@@ -67,24 +61,24 @@ export class CreateCommentsTable1784842712318 implements MigrationInterface {
 
     // فقط ایندکس
     await queryRunner.createIndex(
-      "comments",
+      'comments',
       new TableIndex({
-        name: "IDX_comments_taskId",
-        columnNames: ["taskId"],
+        name: 'IDX_comments_taskId',
+        columnNames: ['taskId'],
       }),
     );
 
     await queryRunner.createIndex(
-      "comments",
+      'comments',
       new TableIndex({
-        name: "IDX_comments_userId",
-        columnNames: ["userId"],
+        name: 'IDX_comments_userId',
+        columnNames: ['userId'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("comments", true);
-    await queryRunner.dropColumn("comments", "accepted");
+    await queryRunner.dropTable('comments', true);
+    await queryRunner.dropColumn('comments', 'accepted');
   }
 }

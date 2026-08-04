@@ -1,21 +1,17 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
-import { CreateTaskDto } from "./dto/create-task.dto";
-import { UpdateTaskDto } from "./dto/update-task.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { TaskEntity } from "./entities/task.entity";
-import { Repository } from "typeorm";
-import { UserEntity } from "../user/entity/user.entity";
-import { AuthMessage, TaskMessage } from "src/common/enums/message.enum";
-import { InjectRedis } from "@nestjs-modules/ioredis";
-import Redis from "ioredis";
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TaskEntity } from './entities/task.entity';
+import { Repository } from 'typeorm';
+import { UserEntity } from '../user/entity/user.entity';
+import { AuthMessage, TaskMessage } from 'src/common/enums/message.enum';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class TaskService {
-  private readonly CACHE_KEY = "tasks:all";
+  private readonly CACHE_KEY = 'tasks:all';
   private readonly CACHE_TTL = 60;
 
   constructor(
@@ -58,15 +54,10 @@ export class TaskService {
     }
 
     const tasks = await this.taskRepository.find({
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
     });
 
-    await this.redis.set(
-      this.CACHE_KEY,
-      JSON.stringify(tasks),
-      "EX",
-      this.CACHE_TTL,
-    );
+    await this.redis.set(this.CACHE_KEY, JSON.stringify(tasks), 'EX', this.CACHE_TTL);
 
     return tasks;
   }

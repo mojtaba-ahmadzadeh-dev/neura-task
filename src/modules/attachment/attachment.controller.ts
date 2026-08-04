@@ -10,65 +10,61 @@ import {
   UseGuards,
   Get,
   Query,
-} from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { memoryStorage } from "multer";
-import { ApiConsumes, ApiBody, ApiTags, ApiOperation } from "@nestjs/swagger";
-import { AttachmentService } from "./attachment.service";
-import { CreateAttachmentDto } from "./dto/create-attachment.dto";
-import { RbacGuard } from "../rbac/guards/rbac.guard";
-import { Pagination } from "src/common/decorators/pagination.decorator";
-import { PaginationDto } from "src/common/dto/pagination.dto";
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
+import { AttachmentService } from './attachment.service';
+import { RbacGuard } from '../rbac/guards/rbac.guard';
+import { Pagination } from 'src/common/decorators/pagination.decorator';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
-@ApiTags("Attachment")
+@ApiTags('Attachment')
 @UseGuards(RbacGuard)
-@Controller("attachments")
+@Controller('attachments')
 export class AttachmentController {
   constructor(private readonly attachmentService: AttachmentService) {}
 
-  @Post("upload")
-  @ApiConsumes("multipart/form-data")
+  @Post('upload')
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
-      type: "object",
+      type: 'object',
       properties: {
         file: {
-          type: "string",
-          format: "binary",
-          description: "فایل مورد نظر",
+          type: 'string',
+          format: 'binary',
+          description: 'فایل مورد نظر',
         },
       },
-      required: ["file"],
+      required: ['file'],
     },
   })
   @UseInterceptors(
-    FileInterceptor("file", {
+    FileInterceptor('file', {
       storage: memoryStorage(),
       limits: {
         fileSize: 15 * 1024 * 1024,
       },
     }),
   )
-  async upload(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createAttachmentDto: CreateAttachmentDto,
-  ) {
-    return this.attachmentService.create(file, createAttachmentDto);
+  upload(@UploadedFile() file: Express.Multer.File) {
+    return this.attachmentService.create(file);
   }
 
   @Get()
   @Pagination()
-  async findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: PaginationDto) {
     return this.attachmentService.findAll(paginationDto);
   }
 
-  @Get(":id")
-  async findOne(@Param("id", ParseIntPipe) id: number) {
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.attachmentService.findOne(id);
   }
 
-  @Delete(":id")
-  async remove(@Param("id", ParseIntPipe) id: number) {
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.attachmentService.remove(id);
   }
 }

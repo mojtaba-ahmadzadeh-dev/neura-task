@@ -7,17 +7,16 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { OtpEntity } from "./otp.entity";
-import { RoleEntity } from "src/modules/rbac/entities/role.entity";
-import { EntityNames } from "../../../common/enums/entity.enum";
-import { BaseEntity } from "../../../common/abestract/base.entity";
-import { ProjectEntity } from "src/modules/projects/entities/project.entity";
-import { CommentEntity } from "src/modules/comment/entities/comment.entity";
-import { AutomationEntity } from "src/modules/automation/entities/automation.entity";
-import { NotificationEntity } from "src/modules/notfication/entities/notfication.entity";
+} from 'typeorm';
+import { OtpEntity } from './otp.entity';
+import { RoleEntity } from 'src/modules/rbac/entities/role.entity';
+import { EntityNames } from '../../../common/enums/entity.enum';
+import { BaseEntity } from '../../../common/abestract/base.entity';
+import { ProjectEntity } from 'src/modules/projects/entities/project.entity';
+import { CommentEntity } from 'src/modules/comment/entities/comment.entity';
+import { AutomationEntity } from 'src/modules/automation/entities/automation.entity';
+import { NotificationEntity } from 'src/modules/notfication/entities/notfication.entity';
 
 @Entity(EntityNames.User)
 export class UserEntity extends BaseEntity {
@@ -35,13 +34,13 @@ export class UserEntity extends BaseEntity {
   isPhoneVerified: boolean;
   @Column({ nullable: true })
   avatar?: string;
-  @Column({ name: "role_id" })
+  @Column({ name: 'role_id' })
   roleId: number;
   @ManyToOne(() => RoleEntity, {
     eager: false,
     nullable: false,
   })
-  @JoinColumn({ name: "role_id" })
+  @JoinColumn({ name: 'role_id' })
   role: RoleEntity;
   @Column({ default: false })
   isEmailVerified: boolean;

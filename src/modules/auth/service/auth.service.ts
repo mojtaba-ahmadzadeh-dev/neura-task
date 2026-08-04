@@ -4,14 +4,14 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { UserEntity } from "../../user/entity/user.entity";
-import { TokenService } from "./token.service";
-import { AuthMessage } from "src/common/enums/message.enum";
-import { randomInt, randomUUID } from "crypto";
-import { OtpEntity } from "src/modules/user/entity/otp.entity";
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from '../../user/entity/user.entity';
+import { TokenService } from './token.service';
+import { AuthMessage } from 'src/common/enums/message.enum';
+import { randomInt } from 'crypto';
+import { OtpEntity } from 'src/modules/user/entity/otp.entity';
 import {
   RegisterDto,
   RegisterMethod,
@@ -19,13 +19,13 @@ import {
   VerifyOtpDto,
   ResetPasswordDto,
   ForgotPasswordDto,
-} from "../dto/auth.dto";
-import * as bcrypt from "bcrypt";
-import { RoleEntity } from "src/modules/rbac/entities/role.entity";
-import type { Response } from "express";
-import { MailService } from "src/modules/mail/mail.service";
-import { deleteInvalidPropertyObject } from "src/common/utils/function.utils";
-import { GoogleUser } from "../types/payload";
+} from '../dto/auth.dto';
+import * as bcrypt from 'bcrypt';
+import { RoleEntity } from 'src/modules/rbac/entities/role.entity';
+import type { Response } from 'express';
+import { MailService } from 'src/modules/mail/mail.service';
+import { deleteInvalidPropertyObject } from 'src/common/utils/function.utils';
+import { GoogleUser } from '../types/payload';
 
 @Injectable()
 export class AuthService {
@@ -40,17 +40,17 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
-  async register(dto: RegisterDto, res: Response) {
+  async register(dto: RegisterDto, _res: Response) {
     const { method, phone, email, password } = dto;
 
     if (method === RegisterMethod.PHONE && !phone) {
-      deleteInvalidPropertyObject(dto, ["email", "password"]);
-      throw new BadRequestException("شماره موبایل الزامی است");
+      deleteInvalidPropertyObject(dto, ['email', 'password']);
+      throw new BadRequestException('شماره موبایل الزامی است');
     }
 
     if (method === RegisterMethod.EMAIL && (!email || !password)) {
-      deleteInvalidPropertyObject(dto, ["phone"]);
-      throw new BadRequestException("ایمیل و رمز عبور الزامی است");
+      deleteInvalidPropertyObject(dto, ['phone']);
+      throw new BadRequestException('ایمیل و رمز عبور الزامی است');
     }
 
     const whereConditions: any = [];
@@ -77,7 +77,7 @@ export class AuthService {
     if (isFirstUser) {
       // ✅ اولین کاربر: نقش ادمین
       const adminRole = await this.roleRepository.findOne({
-        where: { name: "admin" },
+        where: { name: 'admin' },
       });
 
       if (adminRole) {
@@ -85,7 +85,7 @@ export class AuthService {
       } else {
         // اگر نقش ادمین وجود نداشت، ایجاد کن
         const newAdminRole = this.roleRepository.create({
-          name: "admin",
+          name: 'admin',
           permissions: [], // یا هر مقدار پیش‌فرض
         });
         const savedRole = await this.roleRepository.save(newAdminRole);
@@ -94,7 +94,7 @@ export class AuthService {
     } else {
       // ❌ کاربران بعدی: نقش کاربر عادی
       const userRole = await this.roleRepository.findOne({
-        where: { name: "user" },
+        where: { name: 'user' },
       });
 
       if (userRole) {
@@ -102,7 +102,7 @@ export class AuthService {
       } else {
         // اگر نقش کاربر وجود نداشت، ایجاد کن
         const newUserRole = this.roleRepository.create({
-          name: "user",
+          name: 'user',
           permissions: [],
         });
         const savedRole = await this.roleRepository.save(newUserRole);
@@ -141,7 +141,7 @@ export class AuthService {
     }
 
     return {
-      message: "کد تأیید با موفقیت ارسال شد",
+      message: 'کد تأیید با موفقیت ارسال شد',
     };
   }
   async verifyOtp(dto: VerifyOtpDto, res: Response) {
@@ -153,29 +153,29 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException("کاربر یافت نشد");
+      throw new NotFoundException('کاربر یافت نشد');
     }
 
     // پیدا کردن OTP
     const otp = await this.otpRepository.findOne({
       where: { userId: user.id, code },
-      order: { id: "DESC" },
+      order: { id: 'DESC' },
     });
 
     if (!otp) {
-      throw new UnauthorizedException("کد تأیید اشتباه است");
+      throw new UnauthorizedException('کد تأیید اشتباه است');
     }
 
     if (new Date() > otp.expiresIn) {
-      throw new UnauthorizedException("کد تأیید منقضی شده است");
+      throw new UnauthorizedException('کد تأیید منقضی شده است');
     }
 
     // به‌روزرسانی وضعیت تأیید
     if (method === RegisterMethod.PHONE) {
-      deleteInvalidPropertyObject(dto, ["email"]);
+      deleteInvalidPropertyObject(dto, ['email']);
       user.isPhoneVerified = true;
     } else {
-      deleteInvalidPropertyObject(dto, ["phone"]);
+      deleteInvalidPropertyObject(dto, ['phone']);
       user.isEmailVerified = true;
     }
 
@@ -186,14 +186,14 @@ export class AuthService {
     const tokens = await this.tokenService.generateTokens(user.id, user.roleId);
 
     // پاک کردن کوکی‌های قبلی
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token");
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
 
     // تنظیم کوکی‌های جدید
     this.setAuthCookies(res, tokens);
 
     return {
-      message: "تأیید هویت با موفقیت انجام شد",
+      message: 'تأیید هویت با موفقیت انجام شد',
       user: {
         id: user.id,
         phone: user.phone,
@@ -207,19 +207,19 @@ export class AuthService {
     const { method, phone, email, password, code } = dto;
 
     if (method === RegisterMethod.PHONE) {
-      deleteInvalidPropertyObject(dto, ["email", "password"]);
+      deleteInvalidPropertyObject(dto, ['email', 'password']);
 
       if (!phone) {
-        throw new BadRequestException("شماره موبایل الزامی است");
+        throw new BadRequestException('شماره موبایل الزامی است');
       }
 
       const user = await this.userRepository.findOne({ where: { phone } });
       if (!user) {
-        throw new NotFoundException("کاربری با این شماره موبایل یافت نشد");
+        throw new NotFoundException('کاربری با این شماره موبایل یافت نشد');
       }
 
       if (!user.isActive) {
-        throw new UnauthorizedException("حساب کاربری شما غیرفعال شده است");
+        throw new UnauthorizedException('حساب کاربری شما غیرفعال شده است');
       }
 
       // 🟢 حالت اول: کد ارسال نشده -> باید یه OTP جدید بسازیم و بفرستیم
@@ -236,22 +236,19 @@ export class AuthService {
         console.log(`📱 کد تأیید ورود ${phone}: ${otpCode}`);
 
         return {
-          message: "کد تأیید با موفقیت ارسال شد",
+          message: 'کد تأیید با موفقیت ارسال شد',
         };
       }
 
       // 🟢 حالت دوم: کد وارد شده -> verifyOtp رو صدا می‌زنیم
-      return this.verifyOtp(
-        { method: RegisterMethod.PHONE, phone, code } as VerifyOtpDto,
-        res,
-      );
+      return this.verifyOtp({ method: RegisterMethod.PHONE, phone, code }, res);
     }
 
     if (method === RegisterMethod.EMAIL) {
-      deleteInvalidPropertyObject(dto, ["phone", "code"]);
+      deleteInvalidPropertyObject(dto, ['phone', 'code']);
 
       if (!email || !password) {
-        throw new BadRequestException("ایمیل و رمز عبور الزامی است");
+        throw new BadRequestException('ایمیل و رمز عبور الزامی است');
       }
 
       const user = await this.userRepository.findOne({
@@ -269,34 +266,31 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new UnauthorizedException("ایمیل یا رمز عبور اشتباه است");
+        throw new UnauthorizedException('ایمیل یا رمز عبور اشتباه است');
       }
 
       if (!user.isActive) {
-        throw new UnauthorizedException("حساب کاربری شما غیرفعال شده است");
+        throw new UnauthorizedException('حساب کاربری شما غیرفعال شده است');
       }
 
       if (!user.isEmailVerified) {
-        throw new UnauthorizedException("لطفاً ابتدا ایمیل خود را تأیید کنید");
+        throw new UnauthorizedException('لطفاً ابتدا ایمیل خود را تأیید کنید');
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password!);
+      const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new UnauthorizedException("ایمیل یا رمز عبور اشتباه است");
+        throw new UnauthorizedException('ایمیل یا رمز عبور اشتباه است');
       }
 
-      const tokens = await this.tokenService.generateTokens(
-        user.id,
-        user.roleId,
-      );
+      const tokens = await this.tokenService.generateTokens(user.id, user.roleId);
 
-      res.clearCookie("access_token");
-      res.clearCookie("refresh_token");
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
 
       this.setAuthCookies(res, tokens);
 
       return {
-        message: "ورود با موفقیت انجام شد",
+        message: 'ورود با موفقیت انجام شد',
         user: {
           id: user.id,
           email: user.email,
@@ -307,33 +301,33 @@ export class AuthService {
       };
     }
 
-    throw new BadRequestException("روش ورود نامعتبر است");
+    throw new BadRequestException('روش ورود نامعتبر است');
   }
   async refreshToken(refreshToken: string, res: Response) {
     if (!refreshToken) {
-      throw new UnauthorizedException("Refresh token ارائه نشده است");
+      throw new UnauthorizedException('Refresh token ارائه نشده است');
     }
 
     // تازه‌سازی توکن‌ها
     const tokens = await this.tokenService.refreshTokens(refreshToken);
 
     // پاک کردن کوکی‌های قبلی
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token");
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
 
     // تنظیم کوکی‌های جدید
     this.setAuthCookies(res, tokens);
 
     return {
-      message: "توکن با موفقیت تازه‌سازی شد",
+      message: 'توکن با موفقیت تازه‌سازی شد',
     };
   }
   async logout(userId: number, res: Response) {
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token");
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
 
     return {
-      message: "خروج با موفقیت انجام شد",
+      message: 'خروج با موفقیت انجام شد',
     };
   }
   async forgotPassword(dto: ForgotPasswordDto) {
@@ -343,7 +337,7 @@ export class AuthService {
 
     if (!user) {
       return {
-        message: "در صورت وجود حساب کاربری، کد بازیابی ارسال شد",
+        message: 'در صورت وجود حساب کاربری، کد بازیابی ارسال شد',
       };
     }
 
@@ -359,7 +353,7 @@ export class AuthService {
     await this.mailService.sendOtpEmail(email, code); // 👈 اینجا
 
     return {
-      message: "در صورت وجود حساب کاربری، کد بازیابی ارسال شد",
+      message: 'در صورت وجود حساب کاربری، کد بازیابی ارسال شد',
     };
   }
   async resetPassword(dto: ResetPasswordDto) {
@@ -368,20 +362,20 @@ export class AuthService {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
-      throw new NotFoundException("کاربر یافت نشد");
+      throw new NotFoundException('کاربر یافت نشد');
     }
 
     const otp = await this.otpRepository.findOne({
       where: { userId: user.id, code },
-      order: { id: "DESC" },
+      order: { id: 'DESC' },
     });
 
     if (!otp) {
-      throw new UnauthorizedException("کد بازیابی اشتباه است");
+      throw new UnauthorizedException('کد بازیابی اشتباه است');
     }
 
     if (new Date() > otp.expiresIn) {
-      throw new UnauthorizedException("کد بازیابی منقضی شده است");
+      throw new UnauthorizedException('کد بازیابی منقضی شده است');
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
@@ -389,7 +383,7 @@ export class AuthService {
     await this.otpRepository.remove(otp);
 
     return {
-      message: "رمز عبور با موفقیت تغییر یافت",
+      message: 'رمز عبور با موفقیت تغییر یافت',
     };
   }
   async googleAuth(userData: GoogleUser, res: Response) {
@@ -399,21 +393,18 @@ export class AuthService {
 
     if (user) {
       if (!user.isActive) {
-        throw new UnauthorizedException("حساب کاربری شما غیرفعال شده است");
+        throw new UnauthorizedException('حساب کاربری شما غیرفعال شده است');
       }
 
-      const tokens = await this.tokenService.generateTokens(
-        user.id,
-        user.roleId,
-      );
+      const tokens = await this.tokenService.generateTokens(user.id, user.roleId);
 
-      res.clearCookie("access_token");
-      res.clearCookie("refresh_token");
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
 
       this.setAuthCookies(res, tokens);
 
       return {
-        message: "ورود با گوگل با موفقیت انجام شد",
+        message: 'ورود با گوگل با موفقیت انجام شد',
         user: {
           id: user.id,
           email: user.email,
@@ -431,13 +422,13 @@ export class AuthService {
 
     if (isFirstUser) {
       let adminRole = await this.roleRepository.findOne({
-        where: { name: "admin" },
+        where: { name: 'admin' },
       });
 
       if (!adminRole) {
         adminRole = await this.roleRepository.save(
           this.roleRepository.create({
-            name: "admin",
+            name: 'admin',
             permissions: [],
           }),
         );
@@ -445,13 +436,13 @@ export class AuthService {
       roleId = adminRole.id;
     } else {
       let userRole = await this.roleRepository.findOne({
-        where: { name: "user" },
+        where: { name: 'user' },
       });
 
       if (!userRole) {
         userRole = await this.roleRepository.save(
           this.roleRepository.create({
-            name: "user",
+            name: 'user',
             permissions: [],
           }),
         );
@@ -474,13 +465,13 @@ export class AuthService {
 
     const tokens = await this.tokenService.generateTokens(user.id, user.roleId);
 
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token");
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
 
     this.setAuthCookies(res, tokens);
 
     return {
-      message: "ثبت‌نام و ورود با گوگل با موفقیت انجام شد",
+      message: 'ثبت‌نام و ورود با گوگل با موفقیت انجام شد',
       user: {
         id: user.id,
         email: user.email,
@@ -490,26 +481,23 @@ export class AuthService {
       },
     };
   }
-  private setAuthCookies(
-    res: Response,
-    tokens: { accessToken: string; refreshToken: string },
-  ) {
-    const isProduction = process.env.NODE_ENV === "production";
+  private setAuthCookies(res: Response, tokens: { accessToken: string; refreshToken: string }) {
+    const isProduction = process.env.NODE_ENV === 'production';
 
-    res.cookie("access_token", tokens.accessToken, {
+    res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "lax",
+      sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      path: "/",
+      path: '/',
     });
 
-    res.cookie("refresh_token", tokens.refreshToken, {
+    res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "lax",
+      sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 30,
-      path: "/",
+      path: '/',
     });
   }
 }

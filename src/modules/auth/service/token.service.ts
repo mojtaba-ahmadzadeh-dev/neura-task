@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { AuthMessage } from "src/common/enums/message.enum";
-import { AccessTokenPayload, CookiePayload } from "../types/payload";
-import { ConfigService } from "@nestjs/config";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { AuthMessage } from 'src/common/enums/message.enum';
+import { AccessTokenPayload, CookiePayload } from '../types/payload';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TokenService {
@@ -13,7 +13,7 @@ export class TokenService {
 
   createOtpToken(payload: CookiePayload) {
     const token = this.jwtService.sign(payload, {
-      secret: this.configService.get("OTP_TOKEN_SECRET"),
+      secret: this.configService.get('OTP_TOKEN_SECRET'),
       expiresIn: 60 * 2, // 2 دقیقه
     });
     return token;
@@ -22,17 +22,17 @@ export class TokenService {
   verifyOtpToken(token: string): CookiePayload {
     try {
       return this.jwtService.verify(token, {
-        secret: this.configService.get("OTP_TOKEN_SECRET"),
+        secret: this.configService.get('OTP_TOKEN_SECRET'),
       });
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedException(AuthMessage.TryAgain);
     }
   }
 
   createAccessToken(payload: AccessTokenPayload) {
     const token = this.jwtService.sign(payload, {
-      secret: this.configService.get("ACCESS_TOKEN_SECRET"),
-      expiresIn: "7d", // 7 روز
+      secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+      expiresIn: '7d', // 7 روز
     });
     return token;
   }
@@ -40,18 +40,18 @@ export class TokenService {
   createRefreshToken(payload: AccessTokenPayload) {
     return this.jwtService.sign(payload, {
       secret:
-        this.configService.get("REFRESH_TOKEN_SECRET") ||
-        this.configService.get("ACCESS_TOKEN_SECRET"),
-      expiresIn: "30d", // 30 روز
+        this.configService.get('REFRESH_TOKEN_SECRET') ||
+        this.configService.get('ACCESS_TOKEN_SECRET'),
+      expiresIn: '30d', // 30 روز
     });
   }
 
   verifyAccessToken(token: string): AccessTokenPayload {
     try {
       return this.jwtService.verify(token, {
-        secret: this.configService.get("ACCESS_TOKEN_SECRET"),
+        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
       });
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedException(AuthMessage.LoginAgain);
     }
   }
@@ -60,11 +60,11 @@ export class TokenService {
     try {
       return this.jwtService.verify(token, {
         secret:
-          this.configService.get("REFRESH_TOKEN_SECRET") ||
-          this.configService.get("ACCESS_TOKEN_SECRET"),
+          this.configService.get('REFRESH_TOKEN_SECRET') ||
+          this.configService.get('ACCESS_TOKEN_SECRET'),
       });
-    } catch (error) {
-      throw new UnauthorizedException("Refresh token نامعتبر است");
+    } catch (_error) {
+      throw new UnauthorizedException('Refresh token نامعتبر است');
     }
   }
 
@@ -88,8 +88,8 @@ export class TokenService {
       const payload = this.verifyRefreshToken(refreshToken);
 
       return this.generateTokens(payload.userId, payload.roleId);
-    } catch (error) {
-      throw new UnauthorizedException("Refresh token نامعتبر یا منقضی شده است");
+    } catch (_error) {
+      throw new UnauthorizedException('Refresh token نامعتبر یا منقضی شده است');
     }
   }
 }

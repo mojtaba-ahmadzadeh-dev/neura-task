@@ -1,15 +1,11 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CreateRbacDto, CreateRoleDto } from "./dto/create-rbac.dto";
-import { PermissionEntity } from "./entities/permission.entity";
-import { RoleEntity } from "./entities/role.entity";
-import { UserEntity } from "../user/entity/user.entity";
-import { RbacMessages } from "src/common/enums/message.enum";
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateRbacDto, CreateRoleDto } from './dto/create-rbac.dto';
+import { PermissionEntity } from './entities/permission.entity';
+import { RoleEntity } from './entities/role.entity';
+import { UserEntity } from '../user/entity/user.entity';
+import { RbacMessages } from 'src/common/enums/message.enum';
 
 @Injectable()
 export class RbacService {
@@ -25,11 +21,8 @@ export class RbacService {
     @InjectRepository(PermissionEntity)
     private permissionRepo: Repository<PermissionEntity>,
   ) {}
-  
-  async canAccess(
-    userId: number,
-    requiredPermissions: string[],
-  ): Promise<boolean> {
+
+  async canAccess(userId: number, requiredPermissions: string[]): Promise<boolean> {
     const user = await this.userRepo.findOne({
       where: { id: userId },
       relations: {
@@ -53,16 +46,13 @@ export class RbacService {
     if (!user) {
       return false;
     }
-    const userPermissions =
-      user.role?.permissions?.map((permission) => permission.name) || [];
+    const userPermissions = user.role?.permissions?.map((permission) => permission.name) || [];
 
-    if (userPermissions.includes("all")) {
+    if (userPermissions.includes('all')) {
       return true;
     }
-    
-    return requiredPermissions.every((permission) =>
-      userPermissions.includes(permission),
-    );
+
+    return requiredPermissions.every((permission) => userPermissions.includes(permission));
   }
 
   async createRole(dto: CreateRoleDto) {
@@ -71,7 +61,7 @@ export class RbacService {
     });
 
     if (existing) {
-      throw new ConflictException("این نقش قبلاً وجود دارد");
+      throw new ConflictException('این نقش قبلاً وجود دارد');
     }
 
     const role = this.roleRepository.create({
@@ -109,9 +99,7 @@ export class RbacService {
       throw new NotFoundException(RbacMessages.NOTFOUND_PERMISSION);
     }
 
-    const alreadyHasPermission = role.permissions.some(
-      (p) => p.id === permission.id,
-    );
+    const alreadyHasPermission = role.permissions.some((p) => p.id === permission.id);
 
     if (alreadyHasPermission) {
       throw new ConflictException(RbacMessages.ALREADY_PERMISSION);
@@ -144,9 +132,7 @@ export class RbacService {
       throw new NotFoundException(`Role با آیدی ${roleId} پیدا نشد`);
     }
 
-    role.permissions = role.permissions.filter(
-      (permission) => permission.id !== permissionId,
-    );
+    role.permissions = role.permissions.filter((permission) => permission.id !== permissionId);
 
     return await this.roleRepository.save(role);
   }

@@ -1,4 +1,4 @@
 export enum AutomationType {
-  RECURRING = "recurring",
-  REMINDER = "reminder",
+  RECURRING = 'recurring',
+  REMINDER = 'reminder',
 }

@@ -1,14 +1,7 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from "typeorm";
-import { RoleEntity } from "./role.entity";
-import { BaseEntity } from "../../../common/abestract/base.entity";
-import { EntityNames } from "../../../common/enums/entity.enum";
+import { Entity, Column, ManyToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { RoleEntity } from './role.entity';
+import { BaseEntity } from '../../../common/abestract/base.entity';
+import { EntityNames } from '../../../common/enums/entity.enum';
 
 @Entity(EntityNames.Permissions)
 export class PermissionEntity extends BaseEntity {
@@ -18,7 +11,7 @@ export class PermissionEntity extends BaseEntity {
   name: string;
   @Column({
     nullable: true,
-    default: "",
+    default: '',
   })
   description?: string;
   @ManyToMany(() => RoleEntity, (role) => role.permissions)

@@ -5,21 +5,18 @@ import {
   NotFoundException,
   UnauthorizedException,
   ForbiddenException,
-} from "@nestjs/common";
-import { CreateCommentDto } from "./dto/create-comment.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { CommentEntity } from "./entities/comment.entity";
-import { IsNull, Repository } from "typeorm";
-import { TaskEntity } from "../task/entities/task.entity";
-import { REQUEST } from "@nestjs/core";
-import type { Request } from "express";
-import {
-  paginationGenerator,
-  paginationSolver,
-} from "src/common/utils/pagination.utils";
-import { PaginationDto } from "src/common/dto/pagination.dto";
-import { CommentMessage } from "src/common/enums/message.enum";
-import { UpdateCommentDto } from "./dto/update-comment.dto";
+} from '@nestjs/common';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CommentEntity } from './entities/comment.entity';
+import { IsNull, Repository } from 'typeorm';
+import { TaskEntity } from '../task/entities/task.entity';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
+import { paginationGenerator, paginationSolver } from 'src/common/utils/pagination.utils';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CommentMessage } from 'src/common/enums/message.enum';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class CommentService {
@@ -75,7 +72,7 @@ export class CommentService {
         },
       },
       order: {
-        id: "DESC",
+        id: 'DESC',
       },
       skip,
       take: limit,
@@ -109,7 +106,7 @@ export class CommentService {
         },
       },
       order: {
-        id: "DESC",
+        id: 'DESC',
       },
       skip,
       take: limit,

@@ -1,36 +1,22 @@
-import { Module } from "@nestjs/common";
-import { AuthController } from "./controller/auth.controller";
-import { AuthService } from "./service/auth.service";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { UserEntity } from "../user/entity/user.entity";
-import { TokenService } from "./service/token.service";
-import { JwtService } from "@nestjs/jwt";
-import { OtpEntity } from "../user/entity/otp.entity";
-import { RoleEntity } from "../rbac/entities/role.entity";
-import { PermissionEntity } from "../rbac/entities/permission.entity";
-import { UserRepository } from "../user/repository/user.repository";
-import { MailService } from "../mail/mail.service";
-import { GoogleAuthController } from "./controller/google.controller";
-import { GoogleStrategy } from "./strategy/google.strategy";
+import { Module } from '@nestjs/common';
+import { AuthController } from './controller/auth.controller';
+import { AuthService } from './service/auth.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '../user/entity/user.entity';
+import { TokenService } from './service/token.service';
+import { JwtService } from '@nestjs/jwt';
+import { OtpEntity } from '../user/entity/otp.entity';
+import { RoleEntity } from '../rbac/entities/role.entity';
+import { PermissionEntity } from '../rbac/entities/permission.entity';
+import { UserRepository } from '../user/repository/user.repository';
+import { MailService } from '../mail/mail.service';
+import { GoogleAuthController } from './controller/google.controller';
+import { GoogleStrategy } from './strategy/google.strategy';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      UserEntity,
-      OtpEntity,
-      RoleEntity,
-      PermissionEntity,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([UserEntity, OtpEntity, RoleEntity, PermissionEntity])],
   controllers: [AuthController, GoogleAuthController],
-  providers: [
-    AuthService,
-    TokenService,
-    JwtService,
-    UserRepository,
-    MailService,
-    GoogleStrategy,
-  ],
+  providers: [AuthService, TokenService, JwtService, UserRepository, MailService, GoogleStrategy],
   exports: [AuthService, GoogleStrategy],
 })
 export class AuthModule {}
