@@ -37,10 +37,12 @@ export class TaskController {
     return this.taskService.update(+id, updateTaskDto);
   }
   @Patch(":id/assign")
-  async assign(
-    @Param("id") id: string,
-    @Body() assignTaskDto: AssignTaskDto,
-  ) {
+  async assign(@Param("id") id: string, @Body() assignTaskDto: AssignTaskDto) {
     return this.taskService.assignTask(+id, assignTaskDto.assigneeId);
+  }
+
+  @Delete(":id")
+  async remove(@Param("id") id: string) {
+    return this.taskService.remove(+id);
   }
 }
