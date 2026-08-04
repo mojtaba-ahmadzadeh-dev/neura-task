@@ -1,16 +1,21 @@
-import { Reflector } from "@nestjs/core";
+import { Reflector } from '@nestjs/core';
 import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
-} from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { Request } from "express";
-import { UserRepository } from "src/modules/user/repository/user.repository";
-import { UserEntity } from "src/modules/user/entity/user.entity";
-import { RbacMessages } from "src/common/enums/message.enum";
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+import { UserRepository } from 'src/modules/user/repository/user.repository';
+import { UserEntity } from 'src/modules/user/entity/user.entity';
+import { RbacMessages } from 'src/common/enums/message.enum';
+
+interface JwtPayload {
+  userId: number;
+  // اگر فیلدهای دیگه‌ای هم داری اینجا اضافه کن
+}
 
 @Injectable()
 export class RbacGuard implements CanActivate {
@@ -21,17 +26,14 @@ export class RbacGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermissions = this.reflector.get<string[]>(
-      "permissions",
-      context.getHandler(),
-    );
+    const requiredPermissions = this.reflector.get<string[]>('permissions', context.getHandler());
 
     const request = context.switchToHttp().getRequest<Request>();
 
-    let accessToken = request.cookies?.access_token;
+    let accessToken = request.cookies?.access_token as string | undefined;
     if (!accessToken) {
       const authHeader = request.headers.authorization;
-      if (authHeader?.startsWith("Bearer ")) {
+      if (authHeader?.startsWith('Bearer ')) {
         accessToken = authHeader.substring(7);
       }
     }
@@ -40,12 +42,12 @@ export class RbacGuard implements CanActivate {
       throw new UnauthorizedException(RbacMessages.UNAUTHORIZED);
     }
 
-    let payload: any;
+    let payload: JwtPayload;
     try {
-      payload = await this.jwtService.verifyAsync(accessToken, {
+      payload = await this.jwtService.verifyAsync<JwtPayload>(accessToken, {
         secret: process.env.ACCESS_TOKEN_SECRET,
       });
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedException(RbacMessages.INVALID_TOKEN);
     }
 
@@ -61,7 +63,7 @@ export class RbacGuard implements CanActivate {
 
     request.user = user;
 
-    if (user.role?.name?.toLowerCase() === "admin") {
+    if (user.role?.name?.toLowerCase() === 'admin') {
       return true;
     }
 
@@ -71,22 +73,16 @@ export class RbacGuard implements CanActivate {
 
     const userPermissions = user.role?.permissions?.map((p) => p.name) || [];
 
-    const hasAllPermissions = requiredPermissions.every((perm) =>
-      userPermissions.includes(perm),
-    );
+    const hasAllPermissions = requiredPermissions.every((perm) => userPermissions.includes(perm));
 
     if (!hasAllPermissions) {
-      throw new ForbiddenException(
-        `${RbacMessages.FORBIDDEN}: ${requiredPermissions.join(", ")}`,
-      );
+      throw new ForbiddenException(`${RbacMessages.FORBIDDEN}: ${requiredPermissions.join(', ')}`);
     }
 
     return true;
   }
 
-  private async findUserWithPermissions(
-    userId: number,
-  ): Promise<UserEntity | null> {
+  private async findUserWithPermissions(userId: number): Promise<UserEntity | null> {
     return this.userRepository.findUserWithPermissions(userId);
   }
 }

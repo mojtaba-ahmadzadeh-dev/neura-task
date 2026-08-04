@@ -1,5 +1,1 @@
-import { IsOptional, IsString } from "class-validator";
-
-export class CreateAttachmentDto {
-
-}
+export class CreateAttachmentDto {}

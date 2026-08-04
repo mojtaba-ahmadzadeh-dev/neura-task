@@ -1,7 +1,15 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber, MaxLength, MinLength, IsUUID } from "class-validator";
-import { Type } from "class-transformer";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { PaginationDto } from "src/common/dto/pagination.dto";
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsNumber,
+  MaxLength,
+  MinLength,
+  IsUUID,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 export class CreateProjectDto {
   @ApiProperty({
@@ -11,10 +19,10 @@ export class CreateProjectDto {
     maxLength: 255,
     required: true,
   })
-  @IsNotEmpty({ message: "عنوان پروژه الزامی است" })
-  @IsString({ message: "عنوان باید رشته باشد" })
-  @MinLength(3, { message: "عنوان حداقل باید ۳ کاراکتر باشد" })
-  @MaxLength(255, { message: "عنوان حداکثر ۲۵۵ کاراکتر می‌تواند باشد" })
+  @IsNotEmpty({ message: 'عنوان پروژه الزامی است' })
+  @IsString({ message: 'عنوان باید رشته باشد' })
+  @MinLength(3, { message: 'عنوان حداقل باید ۳ کاراکتر باشد' })
+  @MaxLength(255, { message: 'عنوان حداکثر ۲۵۵ کاراکتر می‌تواند باشد' })
   title: string;
 
   @ApiPropertyOptional({
@@ -23,7 +31,7 @@ export class CreateProjectDto {
     nullable: true,
   })
   @IsOptional()
-  @IsString({ message: "توضیحات باید رشته باشد" })
+  @IsString({ message: 'توضیحات باید رشته باشد' })
   description?: string;
 
   @ApiProperty({
@@ -32,8 +40,8 @@ export class CreateProjectDto {
     required: true,
     type: Number,
   })
-  @IsNotEmpty({ message: "شناسه ورک‌اسپیس الزامی است" })
-  @IsNumber({}, { message: "شناسه ورک‌اسپیس باید عدد باشد" })
+  @IsNotEmpty({ message: 'شناسه ورک‌اسپیس الزامی است' })
+  @IsNumber({}, { message: 'شناسه ورک‌اسپیس باید عدد باشد' })
   @Type(() => Number)
   workspaceId: number;
 }

@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { S3 } from "aws-sdk";
-import { extname } from "path";
+import { Injectable } from '@nestjs/common';
+import { S3 } from 'aws-sdk';
+import { extname } from 'path';
 
 @Injectable()
 export class S3Service {
@@ -12,7 +12,7 @@ export class S3Service {
         secretAccessKey: process.env.S3_SECRET_KEY,
       },
       endpoint: process.env.S3_ENDPOINT,
-      region: "default",
+      region: 'default',
     });
   }
   async uploadFile(file: Express.Multer.File, folderName: string) {
@@ -22,7 +22,7 @@ export class S3Service {
         Bucket: process.env.S3_BUCKET_NAME,
         Key: `${folderName}/${Date.now()}${ext}`,
         Body: file.buffer,
-        ACL: "public-read",
+        ACL: 'public-read',
         ContentType: file.mimetype,
       })
       .promise();

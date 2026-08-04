@@ -5,29 +5,29 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
-} from "typeorm";
-import { Workspace } from "./workspace.entity";
-import { UserEntity } from "src/modules/user/entity/user.entity";
-import { Roles } from "src/common/enums/role.enum";
+} from 'typeorm';
+import { Workspace } from './workspace.entity';
+import { UserEntity } from 'src/modules/user/entity/user.entity';
+import { Roles } from 'src/common/enums/role.enum';
 
-@Entity("workspace_members")
+@Entity('workspace_members')
 export class WorkspaceMember {
-  @PrimaryGeneratedColumn("increment")
+  @PrimaryGeneratedColumn('increment')
   id: number;
   @ManyToOne(() => Workspace, (workspace) => workspace.members, {
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: "workspaceId" })
+  @JoinColumn({ name: 'workspaceId' })
   workspace: Workspace;
   @Column()
   workspaceId: number;
-  @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "userId" })
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
   user: UserEntity;
   @Column()
   userId: number;
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: Roles,
     default: Roles.MEMBER,
   })

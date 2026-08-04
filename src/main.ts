@@ -1,8 +1,8 @@
-import { NestFactory } from "@nestjs/core";
-import cookieParser from "cookie-parser";
-import { ValidationPipe } from "@nestjs/common";
-import { SwaggerConfigInit } from "./config/swagger.config";
-import { AppModule } from "./modules/app/app.module";
+import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerConfigInit } from './config/swagger.config';
+import { AppModule } from './modules/app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,4 +24,8 @@ async function bootstrap() {
     console.log(`swagger: http://localhost:${port}/swagger`);
   });
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  console.error('Error starting application:', err);
+  process.exit(1);
+});

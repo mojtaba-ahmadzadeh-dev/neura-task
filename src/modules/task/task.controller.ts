@@ -1,18 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from "@nestjs/common";
-import { TaskService } from "./task.service";
-import { AssignTaskDto, CreateTaskDto } from "./dto/create-task.dto";
-import { UpdateTaskDto } from "./dto/update-task.dto";
-import { ApiConsumes } from "@nestjs/swagger";
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { TaskService } from './task.service';
+import { AssignTaskDto, CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { ApiConsumes } from '@nestjs/swagger';
 
-@Controller("task")
+@Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
@@ -26,23 +18,23 @@ export class TaskController {
     return this.taskService.findAll();
   }
 
-  @Get(":id")
-  async findOne(@Param("id") id: string) {
+  @Get(':id')
+  findOne(@Param('id') id: string) {
     return this.taskService.findOne(+id);
   }
 
-  @Patch(":id")
-  @ApiConsumes("application/x-www-form-urlencoded")
-  async update(@Param("id") id: string, @Body() updateTaskDto: UpdateTaskDto) {
+  @Patch(':id')
+  @ApiConsumes('application/x-www-form-urlencoded')
+  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.update(+id, updateTaskDto);
   }
-  @Patch(":id/assign")
-  async assign(@Param("id") id: string, @Body() assignTaskDto: AssignTaskDto) {
+  @Patch(':id/assign')
+  assign(@Param('id') id: string, @Body() assignTaskDto: AssignTaskDto) {
     return this.taskService.assignTask(+id, assignTaskDto.assigneeId);
   }
 
-  @Delete(":id")
-  async remove(@Param("id") id: string) {
+  @Delete(':id')
+  remove(@Param('id') id: string) {
     return this.taskService.remove(+id);
   }
 }

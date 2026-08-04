@@ -1,4 +1,4 @@
-import { PaginationDto } from "../dto/pagination.dto";
+import { PaginationDto } from '../dto/pagination.dto';
 
 export function paginationSolver(paginationDto: PaginationDto) {
   let { page = 0, limit = 10 } = paginationDto;
@@ -6,7 +6,7 @@ export function paginationSolver(paginationDto: PaginationDto) {
   else page = page - 1;
 
   if (!limit || limit <= 0) limit = 10;
-  let skip = page * limit;
+  const skip = page * limit;
   return {
     page: page === 0 ? 1 : page,
     limit,
@@ -14,11 +14,7 @@ export function paginationSolver(paginationDto: PaginationDto) {
   };
 }
 
-export function paginationGenerator(
-  count: number = 0,
-  page: number = 0,
-  limit: number = 0,
-) {
+export function paginationGenerator(count: number = 0, page: number = 0, limit: number = 0) {
   return {
     totalCount: count,
     page: +page,

@@ -1,17 +1,14 @@
-import { BadRequestException, Inject, Injectable, Scope } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { UserEntity } from "./entity/user.entity";
-import { RoleEntity } from "src/modules/rbac/entities/role.entity";
-import { UpdateUserDto, UpdateUserRoleDto } from "./dto/user.dto";
-import {
-  paginationGenerator,
-  paginationSolver,
-} from "src/common/utils/pagination.utils";
-import { PaginationDto } from "src/common/dto/pagination.dto";
-import { REQUEST } from "@nestjs/core";
-import type { Request } from "express";
-import { S3Service } from "../s3/s3.service";
+import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from './entity/user.entity';
+import { RoleEntity } from 'src/modules/rbac/entities/role.entity';
+import { UpdateUserDto, UpdateUserRoleDto } from './dto/user.dto';
+import { paginationGenerator, paginationSolver } from 'src/common/utils/pagination.utils';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
+import { S3Service } from '../s3/s3.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UserService {
@@ -29,13 +26,13 @@ export class UserService {
 
     const [users, count] = await this.userRepository.findAndCount({
       relations: { role: true },
-      order: { id: "DESC" },
+      order: { id: 'DESC' },
       skip,
       take: limit,
     });
 
     return {
-      message: "لیست کاربران با موفقیت دریافت شد",
+      message: 'لیست کاربران با موفقیت دریافت شد',
       data: users,
       pagination: paginationGenerator(count, page, limit),
     };
@@ -47,11 +44,11 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException("کاربر مورد نظر یافت نشد");
+      throw new BadRequestException('کاربر مورد نظر یافت نشد');
     }
 
     return {
-      message: "اطلاعات کاربر با موفقیت دریافت شد",
+      message: 'اطلاعات کاربر با موفقیت دریافت شد',
       data: user,
     };
   }
@@ -59,7 +56,7 @@ export class UserService {
     const userId = (this.request.user as UserEntity)?.id;
 
     if (!userId) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     return this.getUserById(userId);
@@ -71,7 +68,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException("کاربر مورد نظر یافت نشد");
+      throw new BadRequestException('کاربر مورد نظر یافت نشد');
     }
 
     const newRole = await this.roleRepository.findOne({
@@ -79,11 +76,11 @@ export class UserService {
     });
 
     if (!newRole) {
-      throw new BadRequestException("نقش مورد نظر یافت نشد");
+      throw new BadRequestException('نقش مورد نظر یافت نشد');
     }
 
     if (user.roleId === newRole.id) {
-      throw new BadRequestException("کاربر از قبل دارای این نقش است");
+      throw new BadRequestException('کاربر از قبل دارای این نقش است');
     }
 
     user.roleId = newRole.id;
@@ -92,7 +89,7 @@ export class UserService {
     const updatedUser = await this.userRepository.save(user);
 
     return {
-      message: "نقش کاربر با موفقیت تغییر یافت",
+      message: 'نقش کاربر با موفقیت تغییر یافت',
       data: {
         id: updatedUser.id,
         email: updatedUser.email,
@@ -100,14 +97,11 @@ export class UserService {
       },
     };
   }
-  async updateUser(
-    updateUserDto: UpdateUserDto,
-    avatarFile?: Express.Multer.File,
-  ) {
+  async updateUser(updateUserDto: UpdateUserDto, avatarFile?: Express.Multer.File) {
     const userId = (this.request.user as UserEntity)?.id;
 
     if (!userId) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     const user = await this.userRepository.findOne({
@@ -115,7 +109,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException("کاربر مورد نظر یافت نشد");
+      throw new BadRequestException('کاربر مورد نظر یافت نشد');
     }
 
     const { firstName, lastName, email } = updateUserDto;
@@ -125,7 +119,7 @@ export class UserService {
         where: { email },
       });
       if (emailExists) {
-        throw new BadRequestException("این ایمیل قبلاً ثبت شده است");
+        throw new BadRequestException('این ایمیل قبلاً ثبت شده است');
       }
       user.email = email;
       user.isEmailVerified = false;
@@ -143,17 +137,14 @@ export class UserService {
         }
       }
 
-      const uploadResult = await this.s3Service.uploadFile(
-        avatarFile,
-        "avatars",
-      );
+      const uploadResult = await this.s3Service.uploadFile(avatarFile, 'avatars');
       user.avatar = uploadResult.Location;
     }
 
     const updatedUser = await this.userRepository.save(user);
 
     return {
-      message: "اطلاعات کاربر با موفقیت به‌روزرسانی شد",
+      message: 'اطلاعات کاربر با موفقیت به‌روزرسانی شد',
       data: updatedUser,
     };
   }

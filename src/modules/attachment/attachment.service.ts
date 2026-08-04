@@ -4,20 +4,16 @@ import {
   InternalServerErrorException,
   Scope,
   Inject,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CreateAttachmentDto } from "./dto/create-attachment.dto";
-import { S3Service } from "../s3/s3.service";
-import { AttachmentEntity } from "./entities/attachment.entity";
-import { REQUEST } from "@nestjs/core";
-import type { Request } from "express";
-import { PaginationDto } from "src/common/dto/pagination.dto";
-import {
-  paginationGenerator,
-  paginationSolver,
-} from "src/common/utils/pagination.utils";
-import { AttachmentMessage } from "src/common/enums/message.enum";
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { S3Service } from '../s3/s3.service';
+import { AttachmentEntity } from './entities/attachment.entity';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { paginationGenerator, paginationSolver } from 'src/common/utils/pagination.utils';
+import { AttachmentMessage } from 'src/common/enums/message.enum';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AttachmentService {
@@ -28,16 +24,13 @@ export class AttachmentService {
     @Inject(REQUEST) private readonly request: Request,
   ) {}
 
-  async create(
-    file: Express.Multer.File,
-    createAttachmentDto: CreateAttachmentDto,
-  ): Promise<AttachmentEntity> {
+  async create(file: Express.Multer.File): Promise<AttachmentEntity> {
     if (!file) {
       throw new BadRequestException(AttachmentMessage.FILE_NOT_PROVIDED);
     }
 
     try {
-      const uploaded = await this.s3Service.uploadFile(file, "attachments");
+      const uploaded = await this.s3Service.uploadFile(file, 'attachments');
 
       const userId = (this.request as any).user?.id ?? null;
 
@@ -51,17 +44,15 @@ export class AttachmentService {
       });
 
       return await this.attachmentRepo.save(attachment);
-    } catch (error) {
-      throw new InternalServerErrorException(
-        AttachmentMessage.ERROR_UPLOADING_ATTACHMENT,
-      );
+    } catch (_error) {
+      throw new InternalServerErrorException(AttachmentMessage.ERROR_UPLOADING_ATTACHMENT);
     }
   }
   async findAll(paginationDto: PaginationDto) {
     const { page, limit, skip } = paginationSolver(paginationDto);
 
     const [attachments, count] = await this.attachmentRepo.findAndCount({
-      order: { id: "DESC" },
+      order: { id: 'DESC' },
       skip,
       take: limit,
     });

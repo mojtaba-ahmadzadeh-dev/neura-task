@@ -6,18 +6,16 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-} from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
-  namespace: "/notifications",
+  namespace: '/notifications',
   cors: {
-    origin: "*",
+    origin: '*',
   },
 })
-export class NotificationGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -29,42 +27,36 @@ export class NotificationGateway
     console.log(`Client Disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage("join")
-  async joinRoom(
-    @MessageBody() userId: number,
-    @ConnectedSocket() client: Socket,
-  ) {
+  @SubscribeMessage('join')
+  async joinRoom(@MessageBody() userId: number, @ConnectedSocket() client: Socket) {
     await client.join(`user:${userId}`);
 
-    client.emit("joined", {
+    client.emit('joined', {
       room: `user:${userId}`,
     });
   }
 
-  @SubscribeMessage("leave")
-  async leaveRoom(
-    @MessageBody() userId: number,
-    @ConnectedSocket() client: Socket,
-  ) {
+  @SubscribeMessage('leave')
+  async leaveRoom(@MessageBody() userId: number, @ConnectedSocket() client: Socket) {
     await client.leave(`user:${userId}`);
   }
 
   sendToUser(userId: number, notification: any) {
-    this.server.to(`user:${userId}`).emit("notification:new", notification);
+    this.server.to(`user:${userId}`).emit('notification:new', notification);
   }
 
   updateNotification(userId: number, notification: any) {
-    this.server.to(`user:${userId}`).emit("notification:update", notification);
+    this.server.to(`user:${userId}`).emit('notification:update', notification);
   }
 
   deleteNotification(userId: number, notificationId: number) {
-    this.server.to(`user:${userId}`).emit("notification:delete", {
+    this.server.to(`user:${userId}`).emit('notification:delete', {
       id: notificationId,
     });
   }
 
   unreadCount(userId: number, count: number) {
-    this.server.to(`user:${userId}`).emit("notification:count", {
+    this.server.to(`user:${userId}`).emit('notification:count', {
       count,
     });
   }

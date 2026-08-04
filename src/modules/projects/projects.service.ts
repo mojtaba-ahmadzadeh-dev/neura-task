@@ -5,21 +5,18 @@ import {
   Injectable,
   NotFoundException,
   Scope,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Brackets, Repository } from "typeorm";
-import { REQUEST } from "@nestjs/core";
-import type { Request } from "express";
-import { CreateProjectDto, FindAllProjectsDto } from "./dto/create-project.dto";
-import { ProjectEntity } from "./entities/project.entity";
-import { UserEntity } from "../user/entity/user.entity";
-import {
-  paginationGenerator,
-  paginationSolver,
-} from "src/common/utils/pagination.utils";
-import { Workspace } from "../workspace/entities/workspace.entity";
-import { UpdateProjectDto } from "./dto/update-project.dto";
-import { ProjectMessages } from "src/common/enums/message.enum";
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Brackets, Repository } from 'typeorm';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
+import { CreateProjectDto, FindAllProjectsDto } from './dto/create-project.dto';
+import { ProjectEntity } from './entities/project.entity';
+import { UserEntity } from '../user/entity/user.entity';
+import { paginationGenerator, paginationSolver } from 'src/common/utils/pagination.utils';
+import { Workspace } from '../workspace/entities/workspace.entity';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectMessages } from 'src/common/enums/message.enum';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProjectsService {
@@ -73,14 +70,11 @@ export class ProjectsService {
         },
       });
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof ForbiddenException
-      ) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
         throw error;
       }
       throw new BadRequestException(
-        `${ProjectMessages.ERROR_CREATING_PROJECT}: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_CREATING_PROJECT}: ${error || 'خطای ناشناخته'}`,
       );
     }
   }
@@ -95,14 +89,14 @@ export class ProjectsService {
       const { workspaceId, search } = filters;
 
       const queryBuilder = this.projectRepository
-        .createQueryBuilder("project")
-        .leftJoinAndSelect("project.workspace", "workspace")
-        .orderBy("project.id", "DESC")
+        .createQueryBuilder('project')
+        .leftJoinAndSelect('project.workspace', 'workspace')
+        .orderBy('project.id', 'DESC')
         .skip(skip)
         .take(limit);
 
       if (workspaceId) {
-        queryBuilder.andWhere("project.workspaceId = :workspaceId", {
+        queryBuilder.andWhere('project.workspaceId = :workspaceId', {
           workspaceId,
         });
       }
@@ -110,9 +104,9 @@ export class ProjectsService {
       if (search) {
         queryBuilder.andWhere(
           new Brackets((qb) => {
-            qb.where("project.title ILIKE :search", {
+            qb.where('project.title ILIKE :search', {
               search: `%${search}%`,
-            }).orWhere("project.description ILIKE :search", {
+            }).orWhere('project.description ILIKE :search', {
               search: `%${search}%`,
             });
           }),
@@ -130,7 +124,7 @@ export class ProjectsService {
         throw error;
       }
       throw new BadRequestException(
-        `${ProjectMessages.ERROR_CREATING_PROJECT} ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_CREATING_PROJECT} ${error || 'خطای ناشناخته'}`,
       );
     }
   }
@@ -154,14 +148,11 @@ export class ProjectsService {
 
       return project;
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof ForbiddenException
-      ) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
         throw error;
       }
       throw new BadRequestException(
-        `${ProjectMessages.ERROR_FETCHING_PROJECT}: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_FETCHING_PROJECT}: ${error || 'خطای ناشناخته'}`,
       );
     }
   }
@@ -213,14 +204,11 @@ export class ProjectsService {
         },
       });
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof ForbiddenException
-      ) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
         throw error;
       }
       throw new BadRequestException(
-        `${ProjectMessages.ERROR_UPDATING_PROJECT}: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_UPDATING_PROJECT}: ${error || 'خطای ناشناخته'}`,
       );
     }
   }
@@ -246,14 +234,11 @@ export class ProjectsService {
         message: ProjectMessages.PROJECT_DELETED_SUCCESSFULLY,
       };
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof ForbiddenException
-      ) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
         throw error;
       }
       throw new BadRequestException(
-        `${ProjectMessages.ERROR_DELETING_PROJECT}: ${error || "خطای ناشناخته"}`,
+        `${ProjectMessages.ERROR_DELETING_PROJECT}: ${error || 'خطای ناشناخته'}`,
       );
     }
   }

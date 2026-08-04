@@ -6,14 +6,14 @@ import {
   IsString,
   IsObject,
   MaxLength,
-} from "class-validator";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { NotificationType } from "src/common/enums/notification-type.enum";
-import { NotificationResource } from "src/common/enums/notification-resource.enum";
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { NotificationType } from 'src/common/enums/notification-type.enum';
+import { NotificationResource } from 'src/common/enums/notification-resource.enum';
 
 export class CreateNotficationDto {
   @ApiProperty({
-    description: "آیدی کاربر گیرنده نوتیفیکیشن",
+    description: 'آیدی کاربر گیرنده نوتیفیکیشن',
     example: 12,
   })
   @IsNumber()
@@ -21,17 +21,17 @@ export class CreateNotficationDto {
   receiverId: number;
 
   @ApiProperty({
-    description: "نوع نوتیفیکیشن",
+    description: 'نوع نوتیفیکیشن',
     enum: NotificationType,
-    example: "FOLLOW",
+    example: 'FOLLOW',
   })
   @IsEnum(NotificationType)
   @IsNotEmpty()
   type: NotificationType;
 
   @ApiProperty({
-    description: "عنوان نوتیفیکیشن",
-    example: "فالو جدید",
+    description: 'عنوان نوتیفیکیشن',
+    example: 'فالو جدید',
     maxLength: 150,
   })
   @IsString()
@@ -40,15 +40,15 @@ export class CreateNotficationDto {
   title: string;
 
   @ApiProperty({
-    description: "متن نوتیفیکیشن",
-    example: "علی شما را دنبال کرد",
+    description: 'متن نوتیفیکیشن',
+    example: 'علی شما را دنبال کرد',
   })
   @IsString()
   @IsNotEmpty()
   message: string;
 
   @ApiPropertyOptional({
-    description: "نوع منبع مرتبط با نوتیفیکیشن",
+    description: 'نوع منبع مرتبط با نوتیفیکیشن',
     enum: NotificationResource,
     example: NotificationResource.USER,
   })
@@ -57,7 +57,7 @@ export class CreateNotficationDto {
   resourceType?: NotificationResource;
 
   @ApiPropertyOptional({
-    description: "آیدی منبع مرتبط",
+    description: 'آیدی منبع مرتبط',
     example: 45,
   })
   @IsNumber()
@@ -65,16 +65,16 @@ export class CreateNotficationDto {
   resourceId?: number;
 
   @ApiPropertyOptional({
-    description: "اطلاعات اضافی (اختیاری)",
-    example: { username: "ali", postId: 10 },
+    description: 'اطلاعات اضافی (اختیاری)',
+    example: { username: 'ali', postId: 10 },
   })
   @IsObject()
   @IsOptional()
   metadata?: Record<string, any>;
 
   @ApiPropertyOptional({
-    description: "لینک اکشن وقتی روی نوتیفیکیشن کلیک شد",
-    example: "/profile/ali",
+    description: 'لینک اکشن وقتی روی نوتیفیکیشن کلیک شد',
+    example: '/profile/ali',
   })
   @IsString()
   @IsOptional()

@@ -1,25 +1,15 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Inject,
-  Injectable,
-  Scope,
-} from "@nestjs/common";
-import {
-  CreateInviteDto,
-  CreateWorkspaceDto,
-  UpdateMemberRoleDto,
-} from "./dto/create-workspace.dto";
-import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Workspace } from "./entities/workspace.entity";
-import { Repository } from "typeorm";
-import { WorkspaceMember } from "./entities/workspace-member.entity";
-import { UserEntity } from "../user/entity/user.entity";
-import { Roles } from "src/common/enums/role.enum";
-import slugify from "slugify";
-import { REQUEST } from "@nestjs/core";
-import type { Request } from "express";
+import { BadRequestException, ConflictException, Inject, Injectable, Scope } from '@nestjs/common';
+import { CreateInviteDto, CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Workspace } from './entities/workspace.entity';
+import { Repository } from 'typeorm';
+import { WorkspaceMember } from './entities/workspace-member.entity';
+import { UserEntity } from '../user/entity/user.entity';
+import { Roles } from 'src/common/enums/role.enum';
+import slugify from 'slugify';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
 
 @Injectable({ scope: Scope.REQUEST })
 export class WorkspaceService {
@@ -37,7 +27,7 @@ export class WorkspaceService {
     const user = this.request.user;
 
     if (!user) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     const existingName = await this.workspaceRepository.findOne({
@@ -46,14 +36,14 @@ export class WorkspaceService {
 
     if (existingName) {
       throw new ConflictException(
-        "نام workspace قبلاً استفاده شده است. لطفاً نام دیگری انتخاب کنید.",
+        'نام workspace قبلاً استفاده شده است. لطفاً نام دیگری انتخاب کنید.',
       );
     }
 
     let slug = slugify(createWorkspaceDto.name, {
       lower: true,
       strict: true,
-      locale: "fa",
+      locale: 'fa',
     });
 
     let existingSlug = await this.workspaceRepository.findOne({
@@ -92,7 +82,7 @@ export class WorkspaceService {
     await this.workspaceMemberRepository.save(member);
 
     return {
-      message: "Workspace با موفقیت ایجاد شد",
+      message: 'Workspace با موفقیت ایجاد شد',
       data: savedWorkspace,
     };
   }
@@ -100,21 +90,21 @@ export class WorkspaceService {
     const user = this.request.user;
 
     if (!user) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     const workspaces = await this.workspaceRepository
-      .createQueryBuilder("workspace")
-      .leftJoinAndSelect("workspace.owner", "owner")
-      .leftJoinAndSelect("workspace.members", "member")
-      .leftJoinAndSelect("member.user", "memberUser")
-      .where("workspace.ownerId = :userId", { userId: user.id })
-      .orWhere("member.userId = :userId", { userId: user.id })
-      .orderBy("workspace.createdAt", "DESC")
+      .createQueryBuilder('workspace')
+      .leftJoinAndSelect('workspace.owner', 'owner')
+      .leftJoinAndSelect('workspace.members', 'member')
+      .leftJoinAndSelect('member.user', 'memberUser')
+      .where('workspace.ownerId = :userId', { userId: user.id })
+      .orWhere('member.userId = :userId', { userId: user.id })
+      .orderBy('workspace.createdAt', 'DESC')
       .getMany();
 
     return {
-      message: "لیست workspaceها با موفقیت دریافت شد",
+      message: 'لیست workspaceها با موفقیت دریافت شد',
       data: workspaces,
     };
   }
@@ -122,26 +112,26 @@ export class WorkspaceService {
     const user = this.request.user;
 
     if (!user) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     const workspace = await this.workspaceRepository
-      .createQueryBuilder("workspace")
-      .leftJoinAndSelect("workspace.owner", "owner")
-      .leftJoinAndSelect("workspace.members", "member")
-      .leftJoinAndSelect("member.user", "memberUser")
-      .where("workspace.id = :id", { id })
-      .andWhere("(workspace.ownerId = :userId OR member.userId = :userId)", {
+      .createQueryBuilder('workspace')
+      .leftJoinAndSelect('workspace.owner', 'owner')
+      .leftJoinAndSelect('workspace.members', 'member')
+      .leftJoinAndSelect('member.user', 'memberUser')
+      .where('workspace.id = :id', { id })
+      .andWhere('(workspace.ownerId = :userId OR member.userId = :userId)', {
         userId: user.id,
       })
       .getOne();
 
     if (!workspace) {
-      throw new BadRequestException("Workspace یافت نشد یا دسترسی ندارید");
+      throw new BadRequestException('Workspace یافت نشد یا دسترسی ندارید');
     }
 
     return {
-      message: "Workspace با موفقیت دریافت شد",
+      message: 'Workspace با موفقیت دریافت شد',
       data: workspace,
     };
   }
@@ -149,7 +139,7 @@ export class WorkspaceService {
     const user = this.request.user;
 
     if (!user) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     const workspace = await this.workspaceRepository.findOne({
@@ -160,12 +150,12 @@ export class WorkspaceService {
     });
 
     if (!workspace) {
-      throw new BadRequestException("Workspace مورد نظر یافت نشد");
+      throw new BadRequestException('Workspace مورد نظر یافت نشد');
     }
 
     // چک کردن دسترسی (فقط Owner می‌تواند ویرایش کند)
     if (workspace.ownerId !== user.id) {
-      throw new ConflictException("شما مجوز ویرایش این workspace را ندارید");
+      throw new ConflictException('شما مجوز ویرایش این workspace را ندارید');
     }
 
     // اگر نام تغییر کند، چک تکراری بودن
@@ -176,7 +166,7 @@ export class WorkspaceService {
 
       if (existingName && existingName.id !== id) {
         throw new ConflictException(
-          "نام workspace قبلاً استفاده شده است. لطفاً نام دیگری انتخاب کنید.",
+          'نام workspace قبلاً استفاده شده است. لطفاً نام دیگری انتخاب کنید.',
         );
       }
     }
@@ -187,7 +177,7 @@ export class WorkspaceService {
       slug = slugify(updateWorkspaceDto.name, {
         lower: true,
         strict: true,
-        locale: "fa",
+        locale: 'fa',
       });
 
       // اطمینان از یکتا بودن slug جدید
@@ -215,7 +205,7 @@ export class WorkspaceService {
     const updatedWorkspace = await this.workspaceRepository.save(workspace);
 
     return {
-      message: "Workspace با موفقیت به‌روزرسانی شد",
+      message: 'Workspace با موفقیت به‌روزرسانی شد',
       data: updatedWorkspace,
     };
   }
@@ -223,7 +213,7 @@ export class WorkspaceService {
     const user = this.request.user;
 
     if (!user) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     const workspace = await this.workspaceRepository.findOne({
@@ -232,11 +222,11 @@ export class WorkspaceService {
     });
 
     if (!workspace) {
-      throw new BadRequestException("Workspace مورد نظر یافت نشد");
+      throw new BadRequestException('Workspace مورد نظر یافت نشد');
     }
 
     if (workspace.ownerId !== user.id) {
-      throw new ConflictException("شما مجوز حذف این workspace را ندارید");
+      throw new ConflictException('شما مجوز حذف این workspace را ندارید');
     }
 
     await this.workspaceMemberRepository.delete({ workspaceId: id });
@@ -244,14 +234,14 @@ export class WorkspaceService {
     await this.workspaceRepository.delete(id);
 
     return {
-      message: "Workspace با موفقیت به طور کامل حذف شد",
+      message: 'Workspace با موفقیت به طور کامل حذف شد',
     };
   }
   async invite(id: number, createInviteDto: CreateInviteDto) {
     const user = this.request.user;
 
     if (!user) {
-      throw new BadRequestException("کاربر احراز هویت نشده است");
+      throw new BadRequestException('کاربر احراز هویت نشده است');
     }
 
     const workspace = await this.workspaceRepository.findOne({
@@ -259,7 +249,7 @@ export class WorkspaceService {
     });
 
     if (!workspace) {
-      throw new BadRequestException("Workspace مورد نظر یافت نشد");
+      throw new BadRequestException('Workspace مورد نظر یافت نشد');
     }
 
     // چک کردن دسترسی درخواست‌دهنده (Owner یا عضو با نقش ADMIN)
@@ -271,14 +261,12 @@ export class WorkspaceService {
     const isAdmin = requesterMembership?.role === Roles.Admin;
 
     if (!isOwner && !isAdmin) {
-      throw new ConflictException(
-        "شما مجوز دعوت کردن اعضا به این workspace را ندارید",
-      );
+      throw new ConflictException('شما مجوز دعوت کردن اعضا به این workspace را ندارید');
     }
 
     // جلوگیری از دعوت با نقش OWNER
     if (createInviteDto.role === Roles.OWNER) {
-      throw new BadRequestException("امکان افزودن عضو با نقش OWNER وجود ندارد");
+      throw new BadRequestException('امکان افزودن عضو با نقش OWNER وجود ندارد');
     }
 
     // پیدا کردن کاربر بر اساس ایمیل
@@ -287,7 +275,7 @@ export class WorkspaceService {
     });
 
     if (!invitedUser) {
-      throw new BadRequestException("کاربری با این ایمیل در سیستم یافت نشد");
+      throw new BadRequestException('کاربری با این ایمیل در سیستم یافت نشد');
     }
 
     // چک کردن اینکه کاربر از قبل عضو نباشد
@@ -296,7 +284,7 @@ export class WorkspaceService {
     });
 
     if (existingMember) {
-      throw new ConflictException("این کاربر از قبل عضو workspace است");
+      throw new ConflictException('این کاربر از قبل عضو workspace است');
     }
 
     const member = this.workspaceMemberRepository.create({
@@ -310,7 +298,7 @@ export class WorkspaceService {
     const savedMember = await this.workspaceMemberRepository.save(member);
 
     return {
-      message: "کاربر با موفقیت به workspace اضافه شد",
+      message: 'کاربر با موفقیت به workspace اضافه شد',
       data: savedMember,
     };
   }

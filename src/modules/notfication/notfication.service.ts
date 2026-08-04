@@ -4,14 +4,14 @@ import {
   Scope,
   NotFoundException,
   UnauthorizedException,
-} from "@nestjs/common";
-import { CreateNotficationDto } from "./dto/create-notfication.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { NotificationEntity } from "./entities/notfication.entity";
-import { Repository } from "typeorm";
-import { NotificationGateway } from "./notification.gateway";
-import { REQUEST } from "@nestjs/core";
-import type { Request } from "express";
+} from '@nestjs/common';
+import { CreateNotficationDto } from './dto/create-notfication.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { NotificationEntity } from './entities/notfication.entity';
+import { Repository } from 'typeorm';
+import { NotificationGateway } from './notification.gateway';
+import { REQUEST } from '@nestjs/core';
+import type { Request } from 'express';
 
 @Injectable({ scope: Scope.REQUEST })
 export class NotficationService {
@@ -26,7 +26,7 @@ export class NotficationService {
     const user = (this.request as any).user;
 
     if (!user?.id) {
-      throw new UnauthorizedException("کاربر احراز هویت نشده است");
+      throw new UnauthorizedException('کاربر احراز هویت نشده است');
     }
 
     const notification = this.notificationRepository.create({
@@ -39,14 +39,14 @@ export class NotficationService {
     const saved = await this.notificationRepository.save(notification);
 
     this.notificationGateway.sendToUser(saved.receiverId, {
-      event: "new_notification",
+      event: 'new_notification',
       data: saved,
     });
 
     return saved;
   }
   async findAll() {
-    const user = (this.request as any).user;
+    const _user = (this.request as any).user;
 
     const notifications = await this.notificationRepository.find();
 
@@ -60,7 +60,7 @@ export class NotficationService {
     });
 
     if (!notification) {
-      throw new NotFoundException("نوتیفیکیشن پیدا نشد");
+      throw new NotFoundException('نوتیفیکیشن پیدا نشد');
     }
 
     return notification;
@@ -69,7 +69,7 @@ export class NotficationService {
     const user = (this.request as any).user;
 
     if (!user?.id) {
-      throw new UnauthorizedException("کاربر احراز هویت نشده است");
+      throw new UnauthorizedException('کاربر احراز هویت نشده است');
     }
 
     const notification = await this.notificationRepository.findOne({
@@ -79,13 +79,13 @@ export class NotficationService {
     });
 
     if (!notification) {
-      throw new NotFoundException("نوتیفیکیشن پیدا نشد");
+      throw new NotFoundException('نوتیفیکیشن پیدا نشد');
     }
 
     await this.notificationRepository.remove(notification);
 
     return {
-      message: "نوتیفیکیشن با موفقیت حذف شد",
+      message: 'نوتیفیکیشن با موفقیت حذف شد',
     };
   }
 }

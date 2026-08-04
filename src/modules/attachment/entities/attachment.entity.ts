@@ -1,8 +1,8 @@
-import { UserEntity } from "src/modules/user/entity/user.entity";
-import { BaseEntity } from "../../../common/abestract/base.entity";
-import { Column, Entity, ManyToOne, JoinColumn } from "typeorm";
+import { UserEntity } from 'src/modules/user/entity/user.entity';
+import { BaseEntity } from '../../../common/abestract/base.entity';
+import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
 
-@Entity("attachment")
+@Entity('attachment')
 export class AttachmentEntity extends BaseEntity {
   @Column()
   originalName: string;
@@ -12,10 +12,10 @@ export class AttachmentEntity extends BaseEntity {
   url: string;
   @Column()
   mimetype: string;
-  @Column({ type: "bigint" })
+  @Column({ type: 'bigint' })
   size: number;
-  @ManyToOne(() => UserEntity, { onDelete: "SET NULL", nullable: true })
-  @JoinColumn({ name: "uploadedById" })
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'uploadedById' })
   uploadedBy: UserEntity;
   @Column({ nullable: true })
   uploadedById: number;

@@ -1,4 +1,4 @@
-import { UserEntity } from "src/modules/user/entities/user.entity";
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 declare global {
   namespace Express {
@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-declare module "express-serve-static-core" {
+declare module 'express-serve-static-core' {
   interface Request {
     user?: UserEntity;
   }

@@ -1,11 +1,11 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { Cron, CronExpression } from "@nestjs/schedule";
-import { InjectRepository } from "@nestjs/typeorm";
-import { LessThanOrEqual, Repository } from "typeorm";
-import { AutomationType } from "src/common/enums/automation-type.enum";
-import { calculateNextRunAt } from "src/common/utils/automation.utils";
-import { AutomationEntity } from "../entities/automation.entity";
-import { TaskEntity } from "src/modules/task/entities/task.entity";
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { InjectRepository } from '@nestjs/typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
+import { AutomationType } from 'src/common/enums/automation-type.enum';
+import { calculateNextRunAt } from 'src/common/utils/automation.utils';
+import { AutomationEntity } from '../entities/automation.entity';
+import { TaskEntity } from 'src/modules/task/entities/task.entity';
 
 @Injectable()
 export class AutomationCronService {
@@ -61,7 +61,7 @@ export class AutomationCronService {
       userId: automation.userId,
     } as Partial<TaskEntity>);
 
-    const savedTask = (await this.taskRepo.save(newTask)) as TaskEntity;
+    const savedTask = await this.taskRepo.save(newTask);
 
     automation.lastRunAt = new Date();
     automation.nextRunAt = calculateNextRunAt({
