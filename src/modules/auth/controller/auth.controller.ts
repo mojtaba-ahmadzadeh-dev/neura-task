@@ -1,4 +1,3 @@
-// auth.controller.ts
 import {
   Body,
   Controller,
@@ -30,8 +29,8 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.register(registerDto, res);
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @Post('verify-otp')
@@ -49,14 +48,12 @@ export class AuthController {
   @Post('logout')
   @UseGuards(RbacGuard)
   @HttpCode(HttpStatus.OK)
-  async logout(@Req() req: AuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
+  logout(@Req() req: AuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
     const user = req.user;
-
     if (!user?.id) {
       throw new UnauthorizedException('کاربر احراز هویت نشده است');
     }
-
-    return this.authService.logout(user.id, res);
+    return this.authService.logout(res);
   }
 
   @Post('forgot-password')
