@@ -7,10 +7,20 @@ export class MailService {
   private transporter;
 
   constructor(private configService: ConfigService) {
+    // لاگ برای چک کردن مقادیر env
+    console.log('========== MAIL CONFIG ==========');
+    console.log({
+      host: this.configService.get('MAIL_HOST'),
+      port: this.configService.get('MAIL_PORT'),
+      user: this.configService.get('MAIL_USER'),
+      pass: this.configService.get('MAIL_PASSWORD') ? '***' : 'EMPTY',
+    });
+    console.log('=================================');
+
     this.transporter = nodemailer.createTransport({
       host: this.configService.get('MAIL_HOST'),
       port: this.configService.get('MAIL_PORT'),
-      secure: false,
+      secure: false, // اگر پورت 465 بود این رو true کن
       auth: {
         user: this.configService.get('MAIL_USER'),
         pass: this.configService.get('MAIL_PASSWORD'),
